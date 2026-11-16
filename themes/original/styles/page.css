@@ -2,18 +2,19 @@
    it, and the markers inside that box. A layout states where its boxes are;
    what goes in them is the same on every page.
 
-   Boxes are placed in slide units, which are points. */
+   The content area is the canvas less a two-cell margin: 28 cells across and
+   14 down. The title takes the first two rows, one row separates it from the
+   body, and the body takes the remaining eleven. */
 
 .tmpl-page h1 {
   position: absolute;
-  left: 66px;
-  top: 56.5px;
-  width: 828px;
-  height: 73.12px;
+  left: var(--tmpl-margin);
+  top: var(--tmpl-margin);
+  width: var(--tmpl-content-width);
+  height: calc(2 * var(--tmpl-cell));
   margin: 0;
   display: flex;
   align-items: center;
-  padding: var(--tmpl-inset-y) var(--tmpl-inset-x);
   font-size: var(--tmpl-title-size);
   font-weight: 700;
   line-height: var(--tmpl-line);
@@ -30,10 +31,9 @@
    take it along. A second box on the same page has no heading in it and is
    placed directly. */
 .tmpl-body {
-  margin: 142.38px 0 0 66px;
-  width: 828px;
-  height: 344px;
-  padding: var(--tmpl-inset-y) var(--tmpl-inset-x);
+  margin: calc(5 * var(--tmpl-cell)) 0 0 var(--tmpl-margin);
+  width: var(--tmpl-content-width);
+  height: calc(11 * var(--tmpl-cell));
 }
 
 /* The indent is the list's, so the marker hangs outside it and wrapped text
@@ -45,9 +45,9 @@
   list-style: revert;
 }
 
-/* Each level steps in by 36 points. */
+/* Each level steps in by one cell. */
 .tmpl-body :where(ul, ol) :where(ul, ol) {
-  padding-left: 36px;
+  padding-left: var(--tmpl-indent);
 }
 
 /* The outline page is a bulleted list whose text opens with a number in the

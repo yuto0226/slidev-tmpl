@@ -3,16 +3,16 @@
 </template>
 
 <style>
+/* The bottom margin band, right-aligned with the content area's right edge. */
 .tmpl-page-number {
   position: absolute;
-  left: 728.68px;
-  top: 500.5px;
-  width: 216px;
-  height: 28.75px;
+  right: var(--tmpl-margin);
+  bottom: 0;
+  width: calc(8 * var(--tmpl-cell));
+  height: var(--tmpl-margin);
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: var(--tmpl-inset-y) var(--tmpl-inset-x);
   font-size: var(--tmpl-page-size);
   font-weight: 500;
   color: var(--tmpl-page);

@@ -24,29 +24,32 @@ html:root {
   /* The margin a debugger's breakpoint dot sits out in. */
   --tmpl-gutter: 18px;
 
-  /* The canvas is 960 units wide for a 16/9 slide, so one unit is one point
-     and every size below is the point size it is set in. */
+  /* The canvas is 960 by 540 slide units and a unit is a point. 30 is the
+     largest number that divides both, so a 30pt cell is the only square that
+     tiles the whole slide: 32 columns across, 18 rows down. Every box in the
+     theme is placed and sized in whole cells, and the half cell is what text
+     inside a box moves by. */
+  --tmpl-cell: 30px;
+  --tmpl-half: 15px;
+  /* Two cells on every edge. */
+  --tmpl-margin: 60px;
+  --tmpl-content-width: calc(960px - 2 * var(--tmpl-margin));
+
+  /* Every size is a multiple of 12, so a line at 1.25 is a multiple of the
+     half cell and the text sits on the grid rather than near it. The body is
+     one cell per line, the title two. */
+  --tmpl-line: 1.25;
+  --tmpl-display-size: 60px;
   --tmpl-title-size: 48px;
-  --tmpl-display-size: 54px;
+  --tmpl-subtitle-size: 36px;
   --tmpl-body-size: 24px;
   --tmpl-page-size: 12px;
 
-  /* A single-spaced line is 1.2 times the font size, and the design sets
-     every line to 90% of that. The paragraph gap is not applied above the
-     first paragraph of a box. */
-  --tmpl-line: 1.08;
-  --tmpl-para-gap: 10px;
-  --tmpl-indent: 27px;
-
-  /* A text box insets its content unless it says otherwise. */
-  --tmpl-inset-x: 7.2px;
-  --tmpl-inset-y: 3.6px;
-
-  /* A box anchored to an edge places its first or last line by the font's
-     Windows ascent and descent, which run 0.06 em beyond the typographic
-     ones a browser lays out with. Half of the leading comes back the other
-     way, leaving this much to add. */
-  --tmpl-anchor-gap: 0.02em;
+  /* A paragraph opens half a cell below the one before it, which keeps the
+     next line on the half-cell grid. */
+  --tmpl-para-gap: var(--tmpl-half);
+  /* One cell per list level, so a marker hangs in exactly one cell. */
+  --tmpl-indent: var(--tmpl-cell);
 
   --slidev-theme-primary: var(--tmpl-accent);
   /* Code is set on the slide itself rather than in a panel. */

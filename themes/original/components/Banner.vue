@@ -5,12 +5,14 @@
 </template>
 
 <style>
+/* Four cells tall across the middle of the slide, wide enough that the band
+   still reaches both edges once it is turned. */
 .tmpl-banner {
   position: absolute;
-  left: -102.68px;
-  top: 213.31px;
-  width: 1165.36px;
-  height: 113.39px;
+  left: -120px;
+  top: calc(7 * var(--tmpl-cell));
+  width: 1200px;
+  height: calc(4 * var(--tmpl-cell));
   transform: rotate(-18.426deg);
   display: flex;
   align-items: center;
