@@ -7,9 +7,9 @@
   "license": "MIT",
   "packageManager": "pnpm@10.33.2",
   "scripts": {
-    "dev": "pnpm fonts:check && pnpm --filter deck-demo dev",
-    "build": "pnpm fonts:check && pnpm --filter deck-demo build",
-    "export": "pnpm fonts:check && pnpm --filter deck-demo export",
+    "dev": "pnpm fonts:check && pnpm --filter deck-original dev",
+    "build": "pnpm fonts:check && pnpm --filter deck-original build",
+    "export": "pnpm fonts:check && pnpm --filter deck-original export",
     "fonts": "node scripts/fetch-fonts.mjs",
     "fonts:check": "node scripts/fetch-fonts.mjs --check",
     "format": "prettier --write .",
