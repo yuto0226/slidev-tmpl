@@ -129,7 +129,62 @@ if (!existsSync(path.join(outDir, 'index.html'))) {
   for (const [, name] of html.matchAll(/<li class="theme" id="([^"]+)"/g)) {
     const built = path.join(outDir, 't', name, 'index.html')
     check(`${name} was built`, existsSync(built) && statSync(built).size > 0)
+    if (existsSync(built)) deck(name, built)
   }
+}
+
+// A deck ships only the font chunks its own text can ask for, so a glyph
+// that no shipped face covers falls back to whatever the viewer has, looks
+// almost right, and reports nothing. The build decides what to keep; this
+// asks the built deck whether what it kept covers what it says.
+function deck(name, page) {
+  const dir = path.dirname(page)
+  const assets = path.join(dir, 'assets')
+  if (!existsSync(assets)) return
+
+  const files = readdirSync(assets, { recursive: true })
+    .map((file) => path.join(assets, file))
+    .filter((file) => statSync(file).isFile())
+
+  const missing = [...read(page).matchAll(/rel="preload" as="font"[^>]*href="([^"]+)"/g)]
+    .map((match) => match[1])
+    .filter((url) => !existsSync(path.join(outDir, url.replace(/^\/+/, ''))))
+  check(`${name} preloads fonts that are there`, missing.length === 0, missing.join(', '))
+
+  const covered = []
+  const text = [read(page)]
+  for (const file of files) {
+    if (/\.(?:woff2?|ttf|otf|png|jpe?g|gif|webp|svg|ico|map)$/i.test(file)) continue
+    const body = read(file)
+    if (file.endsWith('.css') && body.includes('@font-face')) {
+      for (const [, range] of body.matchAll(/unicode-range:([^;}]+)/g)) {
+        for (const part of range.split(',')) {
+          const [from, to] = part.trim().replace(/^U\+/i, '').split('-')
+          const low = Number.parseInt(from, 16)
+          covered.push([low, to === undefined ? low : Number.parseInt(to, 16)])
+        }
+      }
+    } else {
+      text.push(body)
+    }
+  }
+  if (covered.length === 0) return
+
+  // Latin and punctuation ride in faces that carry no range at all, so only
+  // what a range could answer for is asked about.
+  const uncovered = new Set()
+  for (const body of text) {
+    for (const char of body) {
+      const code = char.codePointAt(0)
+      if (code < 0x2e80) continue
+      if (!covered.some(([low, high]) => code >= low && code <= high)) uncovered.add(char)
+    }
+  }
+  check(
+    `${name} ships a face for every glyph it sets`,
+    uncovered.size === 0,
+    [...uncovered].join(' '),
+  )
 }
 
 // ----------------------------------------------------------------- report

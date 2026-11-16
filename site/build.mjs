@@ -115,7 +115,7 @@ async function readDeck(name) {
 // time it is built, so filtering the chunks and rules down to the characters it
 // sets turns ~25 MB and 300 rules a weight into a handful.
 function wanted(rule, codepoints) {
-  const range = /unicode-range:([^;]+);/.exec(rule)
+  const range = /unicode-range:([^;}]+)/.exec(rule)
   if (!range) return true
 
   return range[1].split(',').some((part) => {
@@ -125,6 +125,66 @@ function wanted(rule, codepoints) {
     for (const code of codepoints) if (code >= low && code <= high) return true
     return false
   })
+}
+
+// Slidev bundles every face the theme ships into one render-blocking
+// stylesheet and emits a chunk for each. A deck's text is fixed once it is
+// built, so the chunks it can ever ask for are known, and the rest are weight
+// the reader pays for and never uses.
+async function narrowDeckFonts(out, base) {
+  const assets = path.join(out, 'assets')
+  if (!existsSync(assets)) return
+
+  // Slidev nests some of its own chunks, and the font chunks sit at the top.
+  const entries = await readdir(assets, { withFileTypes: true, recursive: true })
+  const files = entries
+    .filter((entry) => entry.isFile())
+    .map((entry) => path.join(entry.parentPath, entry.name))
+
+  const sheets = []
+  const text = [await readFile(path.join(out, 'index.html'), 'utf8')]
+  const chunks = new Map()
+  for (const file of files) {
+    const name = path.basename(file)
+    if (name.endsWith('.woff2')) {
+      chunks.set(name, file)
+      continue
+    }
+    if (/\.(?:woff|ttf|otf|png|jpe?g|gif|webp|svg|ico|map)$/i.test(name)) continue
+    const body = await readFile(file, 'utf8')
+    if (name.endsWith('.css') && body.includes('@font-face')) sheets.push({ file, body })
+    else text.push(body)
+  }
+  if (sheets.length === 0) return
+
+  const codepoints = new Set(text.flatMap((body) => [...body].map((c) => c.codePointAt(0))))
+
+  const keep = new Set()
+  let dropped = 0
+  for (const sheet of sheets) {
+    const narrowed = sheet.body.replace(/@font-face\{[^}]*\}/g, (rule) => {
+      if (!wanted(rule, codepoints)) {
+        dropped += 1
+        return ''
+      }
+      // Vite inlines a small face as a data URI, which is already in the
+      // sheet and names no file.
+      const url = /url\(([^)]+)\)/.exec(rule)
+      const href = url?.[1].replace(/["']/g, '')
+      if (href?.endsWith('.woff2')) keep.add(path.basename(href))
+      return rule
+    })
+    await writeFile(sheet.file, narrowed, 'utf8')
+  }
+
+  let removed = 0
+  for (const [name, file] of chunks) {
+    if (keep.has(name)) continue
+    await rm(file)
+    removed += 1
+  }
+
+  console.log(`  fonts: kept ${keep.size} chunks, dropped ${dropped} faces and ${removed} files`)
 }
 
 async function copyFonts(html) {
@@ -199,6 +259,8 @@ for (const name of names) {
       '--router-mode',
       'hash',
     ])
+
+    await narrowDeckFonts(out, `${base}t/${name}/`)
 
     console.log(`${name}: shooting slides ${deck.preview.join(', ')}`)
     slidev(deck, [
