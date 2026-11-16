@@ -1,0 +1,96 @@
+/* Wide enough for a margin, the rail stands in it and keeps its place while
+   the page scrolls. Narrower, there is no margin to stand in, so it lies down
+   under the header as the names alone, because ticks say nothing once they
+   are wrapped across lines. */
+.rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--half) var(--cell);
+  margin: calc(2 * var(--cell)) 0 0;
+  font-size: 11px;
+}
+/* 6px of padding on an 11px line is the 24px a finger needs. */
+.rail a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  color: var(--pencil);
+  text-decoration: none;
+}
+.rail i {
+  display: none;
+}
+.rail span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.rail a:hover,
+.rail a:focus-visible,
+.rail a[aria-current] {
+  color: var(--ink);
+}
+
+/* Following a tick is a jump of several screens, so the page rides there
+   rather than cutting, and stops a cell clear of the heading. */
+html {
+  scroll-behavior: smooth;
+}
+.theme {
+  scroll-margin-top: var(--cell);
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (min-width: 78rem) {
+  /* A cell of air on each side. The ticks measure the page rather than
+     bordering it, and they stop reading that way the moment they touch the
+     slides. */
+  .rail {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    display: grid;
+    gap: 2px;
+    width: calc((100vw - (var(--slide) + 2 * var(--cell))) / 2);
+    padding: 0 var(--cell);
+    margin: 0;
+  }
+
+  /* Every tick ends on the same line, so the line is the rule's spine. */
+  .rail::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--cell) + 15px);
+    width: 1px;
+    background: var(--minor);
+  }
+
+  .rail a {
+    display: grid;
+    grid-template-columns: 15px auto;
+  }
+  .rail i {
+    display: block;
+    justify-self: end;
+    width: 9px;
+    height: 1px;
+    background: var(--draft);
+    transition:
+      width 160ms ease-out,
+      background-color 160ms ease-out;
+  }
+  .rail a:hover i,
+  .rail a:focus-visible i,
+  .rail a[aria-current] i {
+    width: 15px;
+    background: var(--ink);
+  }
+}
