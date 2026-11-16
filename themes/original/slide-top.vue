@@ -8,12 +8,8 @@ const root = ref(null)
 const cols = ref([])
 const rows = ref([])
 
-/* Every edge of every box the layout placed, read back from the slide rather
-   than listed here, so adding a layout needs nothing here.
-
-   The overlay is laid out in slide units and shown scaled, so offsetWidth is
-   the slide's own 960 and the ratio between the two converts a measurement
-   back. */
+/* The overlay is laid out in slide units and shown scaled, so the ratio of the
+   bounding width to offsetWidth converts a measurement back to slide units. */
 function measure() {
   const el = root.value
   if (!el) return
@@ -43,9 +39,8 @@ function measure() {
 }
 
 /* Slidev mounts every slide at once and hides all but the current one with
-   v-show, so this runs first against a display: none slide that measures
-   zero. Observing the size covers that, because becoming visible is a resize;
-   toggling the guides is not, so it still asks on its own. */
+   v-show, so the first measurement runs against a display: none slide and gets
+   zero. Observing the size covers that, because becoming visible is a resize. */
 const observer = authoring ? new ResizeObserver(measure) : null
 
 onMounted(() => observer?.observe(root.value))
@@ -55,8 +50,7 @@ watch(guideLevel, () => requestAnimationFrame(measure))
 </script>
 
 <template>
-  <!-- Slidev renders this layer inside every slide, so the overlay shares the
-       slide's coordinate space and scales with it, and a line drawn at 30px
+  <!-- Slidev renders this layer inside every slide, so a line drawn at 30px
        lands on the cell the layout was placed in. -->
   <div v-if="authoring" ref="root" class="tmpl-guides">
     <template v-if="guideLevel">
@@ -90,9 +84,6 @@ watch(guideLevel, () => requestAnimationFrame(measure))
   pointer-events: none;
 }
 
-/* One repeating gradient an axis draws a whole grid without a node per line.
-   Half cells are where a line of text actually lands, so they are drawn under
-   the cells rather than instead of them. */
 .tmpl-guides-grid {
   position: absolute;
   inset: 0;
@@ -119,14 +110,8 @@ watch(guideLevel, () => requestAnimationFrame(measure))
   --tmpl-guides-step: var(--tmpl-cell);
 }
 
-/* A box edge cuts the whole slide, so anything else can be lined up against
-   it and not only against the box it came from. The margin is the frame the
-   boxes sit in rather than one of them, and it is the same on every slide, so
-   it is drawn colourless and recedes. It comes last, which covers a box edge
-   that lands on it.
-
-   These colours are literals rather than tokens. An authoring aid that took
-   the theme's palette would disappear against a slide using those colours. */
+/* These colours are literals and not tokens, because an authoring aid that
+   took the theme's palette would disappear against a slide using it. */
 .tmpl-guides-col,
 .tmpl-guides-row {
   position: absolute;

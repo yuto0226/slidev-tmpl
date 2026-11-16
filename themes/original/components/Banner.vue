@@ -5,8 +5,8 @@
 </template>
 
 <style>
-/* Four cells tall across the middle of the slide, wide enough that the band
-   still reaches both edges once it is turned. */
+/* Wider than the slide so the band still reaches both edges once it is
+   rotated. */
 .tmpl-banner {
   position: absolute;
   left: -120px;

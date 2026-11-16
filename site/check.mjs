@@ -1,5 +1,5 @@
-// Whether the build's output refers to things that exist. Whether the page
-// looks right or behaves is read on the page itself.
+// This checks only that the output refers to things that exist. Looks and
+// behaviour are read on the page itself.
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
@@ -20,8 +20,6 @@ function check(what, condition, detail = '') {
 
 const read = (file) => readFileSync(file, 'utf8')
 
-// ------------------------------------------------- the page's own sources
-
 const markup = read(path.join(sourceDir, 'page.mjs'))
 
 // Read off page.mjs rather than listed again here, because a file nobody
@@ -39,11 +37,9 @@ check('the page inlines a stylesheet', styles.length > 0)
 // declaration holds its initial value for ever, so a scale goes on being drawn
 // while it has quietly stopped moving.
 const declared = new Set([
-  // in the stylesheets, as a declaration or as a registration
   ...[...styles.matchAll(/(?:^|[;{]|@property)\s*(--[\w-]+)\s*[:{\n]/gm)].map((m) => m[1]),
-  // in the markup, as an inline style on the element that needs it
   ...[...markup.matchAll(/(--[\w-]+):/g)].map((m) => m[1]),
-  // and by the build, one a face, so the page asks for what was shipped
+  // Set by the build, so no file declares them.
   ...indexFonts.map(({ role }) => `--${role}`),
 ])
 
@@ -60,10 +56,9 @@ const unread = [...declared].filter(
 )
 check('no custom property is declared and never read', unread.length === 0, unread.join(', '))
 
-// A clean checkout has to build, so everything the build reads has to be
-// something git hands over. Only an untracked file on disk can fail this, and
-// a CI checkout has none, so it runs in the pre-commit hook rather than only
-// in the workflow.
+// A clean checkout has to build, so everything the build reads must be
+// tracked. Only an untracked file on disk can fail this and a CI checkout has
+// none, so it runs in the pre-commit hook.
 const tracked = new Set(
   execFileSync('git', ['ls-files', 'site'], { cwd: root, encoding: 'utf8' })
     .split('\n')
@@ -74,20 +69,15 @@ for (const file of [...sources, 'page.mjs']) {
   check(`site/${file} is tracked`, tracked.has(`site/${file}`), 'page.mjs reads it')
 }
 
-// ------------------------------------------------------------- the output
-
 if (!existsSync(path.join(outDir, 'index.html'))) {
   console.log('site/ is not built; checked the sources only\n')
 } else {
   const html = read(path.join(outDir, 'index.html'))
 
-  // A value that failed to arrive reaches the page as a word that reads as a
-  // fact.
   for (const leak of ['undefined', 'NaN', '[object Object]', '>null<']) {
     check(`no ${leak} reached the page`, !html.includes(leak))
   }
 
-  // Every local thing the page names has to be on disk under it.
   const base = /<link rel="stylesheet" href="([^"]*)fonts\/fonts\.css">/.exec(html)?.[1] ?? '/'
   const referenced = [...html.matchAll(/(?:src|href)="([^"#]+)"/g)]
     .map((match) => match[1])
@@ -133,10 +123,9 @@ if (!existsSync(path.join(outDir, 'index.html'))) {
   }
 }
 
-// A deck ships only the font chunks its own text can ask for, so a glyph
-// that no shipped face covers falls back to whatever the viewer has, looks
-// almost right, and reports nothing. The build decides what to keep; this
-// asks the built deck whether what it kept covers what it says.
+// The build decides which chunks a deck keeps. This asks the built deck
+// whether they cover what it says, because an uncovered glyph falls back to a
+// system font and reports nothing.
 function deck(name, page) {
   const dir = path.dirname(page)
   const assets = path.join(dir, 'assets')
@@ -186,8 +175,6 @@ function deck(name, page) {
     [...uncovered].join(' '),
   )
 }
-
-// ----------------------------------------------------------------- report
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} of ${checked} checks failed:\n`)

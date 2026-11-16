@@ -10,12 +10,8 @@ const description = 'Yuto 做簡報用的 Slidev 主題都放在這裡，一個�
 const entities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }
 const escape = (text) => String(text).replace(/[&<>"]/g, (char) => entities[char])
 
-// Indents every line of a value to match the literal in front of its
-// placeholder, so a piece of markup is written at its own indentation and
-// nests anywhere. A placeholder alone on its line takes the line with it
-// when its value is empty.
-//
-// Prettier reformats an html`` template, including the indentation this
+// A placeholder alone on its line takes the line with it when its value is
+// empty. Prettier reformats an html`` template, including the indentation this
 // reads, so the tag is named markup.
 function markup(strings, ...values) {
   let out = strings[0]
@@ -48,8 +44,6 @@ function specs(deck) {
     .map(([key, value]) => `<div><dt>${key}</dt><dd>${escape(value)}</dd></div>`)
 }
 
-// The heading comes before the slides it names, or from the second theme on
-// they would fall under the heading above.
 function card(deck, { base }, first) {
   const href = `${base}t/${deck.name}/`
   const [cover, ...rest] = deck.preview

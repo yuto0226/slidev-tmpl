@@ -1,5 +1,5 @@
-// Which theme the page is on, so the rail can mark it. No browser lets CSS
-// ask that yet. Everything else the rail does is CSS.
+// No browser lets CSS ask which theme is in view, so this marks the rail's
+// current one. Everything else the rail does is CSS.
 const links = new Map([...document.querySelectorAll('.rail a')].map((a) => [a.hash.slice(1), a]))
 const order = [...links.keys()]
 const open = new Set()

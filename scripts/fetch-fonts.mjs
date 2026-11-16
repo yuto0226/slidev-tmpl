@@ -77,9 +77,8 @@ async function splitFace(zip, font, face, outDir) {
   if (sheets.length !== 1) {
     throw fail(`${font.family} ${face.weight}`, `expected one stylesheet, found ${sheets.length}`)
   }
-  // A local() source would let whatever copy of the family a viewer has
-  // installed replace the pinned one, silently and unseen by the author.
-  // cn-font-split emits it unconditionally, so it is cut from the text.
+  // cn-font-split emits local() unconditionally, which would let whatever
+  // copy of the family a viewer has installed replace the pinned one.
   const sheet = path.join(outDir, sheets[0])
   const css = await readFile(sheet, 'utf8')
   const stripped = css.replace(/local\([^)]*\),\s*/g, '')

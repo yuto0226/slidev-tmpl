@@ -1,16 +1,11 @@
-/* Code sits on the slide with no panel, so these rules undo Slidev's panel
-   styling and restore what a listing needs. --tmpl-code-dim and
-   --tmpl-code-band are what a step does to a line, so a variant overrides
-   them instead of rewriting the selectors. */
 .slidev-code {
   --tmpl-code-dim: 0.35;
   --tmpl-code-band: var(--tmpl-highlight);
 }
 
-/* No variable reaches these. The CSS reset claims every code, kbd, samp and
-   pre. Slidev answers it on the fenced block's pre, but Shiki nests a code
-   element inside that the reset matches in turn, and inline code is never
-   answered. */
+/* The CSS reset claims every code element. Slidev answers it on the fenced
+   block's pre, but the code element Shiki nests inside matches the reset
+   again, and inline code is never answered. */
 .slidev-code code,
 .slidev-layout :not(pre) > code {
   font-family: var(--slidev-code-font-family);
@@ -24,9 +19,8 @@
   font-synthesis: none;
 }
 
-/* A line is an inline span, so a background on it would stop at the last
-   glyph. A grid makes every line a row of its own, full width, and drops the
-   newlines between them, which would otherwise be rendered as well. */
+/* A line is an inline span, so its background would stop at the last glyph. A
+   grid makes each line a full-width row and drops the newlines between lines. */
 .slidev-code code {
   display: grid;
 }
@@ -37,9 +31,8 @@
   content: ' ';
 }
 
-/* Slidev marks the lines a step is about and dims the rest. The band appears
-   only once some other line has been dimmed, because the first step of a
-   walk marks every line and would otherwise tint the whole block. */
+/* The band appears only once some line has been dimmed, because the first step
+   of a walk marks every line and would otherwise tint the whole block. */
 .slidev-code:has(.slidev-code-dishonored) .slidev-code-highlighted {
   background: var(--tmpl-code-band);
 }
@@ -48,16 +41,13 @@
   opacity: var(--tmpl-code-dim);
 }
 
-/* A debugger view. Its step says where execution has stopped rather than
-   what the talk is about, so no line is dimmed and the stopped one is tinted
-   the way a debugger tints it. */
+/* A step in a debugger view marks where execution stopped and not what the
+   talk is about, so nothing is dimmed. */
 .code-debug .slidev-code {
   --tmpl-code-dim: 1;
   --tmpl-code-band: var(--tmpl-breakpoint-row);
 }
 
-/* The breakpoint dot hangs in a gutter on the left of the block, as in a
-   debugger. */
 .code-debug .slidev-code code {
   padding-left: var(--tmpl-gutter);
 }

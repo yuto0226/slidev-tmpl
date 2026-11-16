@@ -12,16 +12,12 @@ const props = defineProps({
 
 const WIDTH = 16
 
-// Which bytes carry the gaps that group the row. Naming them by index keeps
-// WIDTH the only place the row's shape is stated.
 const edge = (i) => ({
   'memory-first': i === 0,
   'memory-mid': i === WIDTH / 2,
   'memory-last': i === WIDTH - 1,
 })
 
-// A heading is a column number, not a byte, so it is set in the width of one
-// without the leading zero a byte would carry.
 const columns = Array.from({ length: WIDTH }, (_, i) => hex(i, 2, { fill: ' ' }))
 
 function cell(byte, offset) {
@@ -92,9 +88,8 @@ const rows = computed(() => {
   border-spacing: 0;
 }
 
-/* Every gap is counted in characters, the grid a hex dump is read on: one
-   between bytes, two at the halfway mark, one on either side of a column
-   rule. */
+/* Gaps are counted in characters, with one between bytes, two at the halfway
+   mark and one on either side of a column rule. */
 .memory-dump th,
 .memory-dump td {
   padding: 0 0.5ch;

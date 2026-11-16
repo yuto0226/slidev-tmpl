@@ -12,8 +12,7 @@ function toggle(event) {
 </script>
 
 <template>
-  <!-- Slidev gives an addition the last slot, past the slide counter, so the
-       divider is what keeps this from reading as part of the counter. -->
+  <!-- Slidev gives an addition the last slot, past the slide counter. -->
   <template v-if="authoring">
     <div class="w-1px opacity-10 bg-current m-1 lg:m-2" />
     <button

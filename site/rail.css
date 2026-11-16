@@ -1,7 +1,6 @@
-/* Wide enough for a margin, the rail stands in it and keeps its place while
-   the page scrolls. Narrower, there is no margin to stand in, so it lies down
-   under the header as the names alone, because ticks say nothing once they
-   are wrapped across lines. */
+/* Below 78rem there is no margin to stand in, so the rail lies under the
+   header as names alone, because ticks say nothing once they wrap across
+   lines. */
 .rail {
   display: flex;
   flex-wrap: wrap;
@@ -32,8 +31,6 @@
   color: var(--ink);
 }
 
-/* Following a tick is a jump of several screens, so the page rides there
-   rather than cutting, and stops a cell clear of the heading. */
 html {
   scroll-behavior: smooth;
 }
@@ -47,9 +44,8 @@ html {
 }
 
 @media (min-width: 78rem) {
-  /* A cell of air on each side. The ticks measure the page rather than
-     bordering it, and they stop reading that way the moment they touch the
-     slides. */
+  /* A cell of air on each side, because the ticks measure the page and stop
+     reading that way once they touch the slides. */
   .rail {
     position: fixed;
     top: 50%;
@@ -62,7 +58,7 @@ html {
     margin: 0;
   }
 
-  /* Every tick ends on the same line, so the line is the rule's spine. */
+  /* The 15px offset must match the tick column in grid-template-columns below. */
   .rail::before {
     content: '';
     position: absolute;

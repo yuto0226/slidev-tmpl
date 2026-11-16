@@ -10,7 +10,6 @@ const props = defineProps({
   word: { type: Number, default: 4 },
   // A region taller than this is drawn broken rather than to scale.
   maxWords: { type: Number, default: 4 },
-  // Fill the regions one click at a time.
   steps: { type: Boolean, default: false },
 })
 
@@ -23,8 +22,6 @@ function address(offset) {
   return `0x${hex(value, digits.value, { lower: true })}`
 }
 
-// Regions are drawn to scale, because how far a buffer reaches is what a frame
-// diagram usually shows.
 const rows = computed(() => {
   let offset = 0
   const out = props.regions.map((region) => {
@@ -65,8 +62,6 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
           :class="{ 'diagram-mark': row.mark, 'stack-broken': row.broken }"
         >
           <div>{{ row.label }}</div>
-          <!-- A broken region cannot show its size by its height, so it prints
-               it. -->
           <div v-if="row.broken" class="stack-size">{{ row.size }} bytes</div>
         </div>
       </div>
@@ -85,8 +80,7 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
   grid-template-columns: 1fr 1.4fr;
 }
 
-/* An address names a boundary, not a region, so it sits on the line between
-   two regions rather than beside the middle of one. */
+/* An address names a boundary, so it sits on the line between two regions. */
 .stack-addr {
   display: flex;
   align-items: flex-end;
@@ -99,10 +93,9 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
   translate: 0 50%;
 }
 
-/* A region is outlined rather than filled. Regions share an edge by each
-   drawing every side but the top, and the topmost region gets its top back.
-   Overlapping boxes would let the later one paint over the edge of the
-   earlier one. */
+/* Regions share an edge by each drawing every side but the top, and the
+   topmost region gets its top back, because overlapping boxes would let the
+   later one paint over the earlier one's edge. */
 .stack-region {
   margin-left: 1ch;
   border: solid var(--tmpl-rule);
@@ -130,8 +123,6 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
   font-size: 12px;
 }
 
-/* A region drawn short of its size is cut across the middle, so its height
-   reads as elided. */
 .stack-broken {
   background-image: linear-gradient(to right, var(--tmpl-rule) 50%, transparent 50%);
   background-position: 0 50%;

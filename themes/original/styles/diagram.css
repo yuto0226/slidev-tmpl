@@ -1,6 +1,3 @@
-/* The stack frame and the memory dump share hex addresses down the left, one
-   rule weight, and one colour for whatever the talk points at. Those are
-   defined here so the two cannot drift apart. */
 .diagram {
   font-family: var(--slidev-code-font-family);
 }

@@ -11,7 +11,6 @@
 </template>
 
 <style>
-/* A cover runs the block across the content width and centres it. */
 .cover-title,
 .cover-subtitle {
   position: absolute;

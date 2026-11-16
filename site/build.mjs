@@ -1,9 +1,6 @@
-// Builds every deck under decks/ into one static site and writes the index
-// that links them.
-//
 // A Slidev SPA bakes its base path into asset URLs at build time and Pages
-// serves a project site under the repository name, so --base is given rather
-// than discovered, and the same tree builds for Pages and for a local check.
+// serves a project site under the repository name, so --base is passed in
+// rather than discovered.
 
 import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -25,8 +22,8 @@ function flag(name, fallback) {
 const trimmed = flag('base', '/').replace(/^\/+|\/+$/g, '')
 const base = trimmed ? `/${trimmed}/` : '/'
 
-// Rewriting the index takes 0.3 seconds against 18 for a deck, so this leaves
-// the decks already in dist/ alone and can describe one older than itself.
+// Rewriting the index takes 0.3 seconds against 18 for a deck, and leaving the
+// decks in dist/ alone lets it describe one older than itself.
 const indexOnly = process.argv.includes('--index-only')
 
 // Pages reports a custom domain over http until HTTPS is enforced on it, and
@@ -44,9 +41,9 @@ function slidev(deck, args) {
   execFileSync(process.execPath, [cli, ...args], { cwd: deck.dir, stdio: 'inherit' })
 }
 
-// Reading the grid back out of base.css keeps the index from drifting from the
-// theme it describes. A renamed token would otherwise reach the page as "null",
-// which reads as a fact rather than a missing one.
+// Reading the grid from base.css keeps the index from drifting, and throwing
+// on a renamed token stops "null" reaching the page, where it would read as a
+// fact.
 function pixels(css, theme, name) {
   const match = css.match(new RegExp(`--tmpl-${name}:\\s*([^;]+);`))
   if (!match) throw new Error(`${theme}: base.css declares no --tmpl-${name}`)
@@ -110,10 +107,10 @@ async function readDeck(name) {
   }
 }
 
-// A deck needs every chunk of a split CJK face, because its text is whatever
-// the author writes next. This page does not, because its text is fixed by the
-// time it is built, so filtering the chunks and rules down to the characters it
-// sets turns ~25 MB and 300 rules a weight into a handful.
+// The unicode-range pattern does not require a trailing semicolon, because the
+// bundler drops it, and a version that required one silently kept every face.
+// Filtering to the codepoints a page sets turns ~25 MB and 300 rules into a
+// handful.
 function wanted(rule, codepoints) {
   const range = /unicode-range:([^;}]+)/.exec(rule)
   if (!range) return true
@@ -127,14 +124,10 @@ function wanted(rule, codepoints) {
   })
 }
 
-// Slidev bundles every face the theme ships into one render-blocking
-// stylesheet and emits a chunk for each. A deck's text is fixed once it is
-// built, so the chunks it can ever ask for are known, and the rest are weight
-// the reader pays for and never uses.
-//
-// What is kept is preloaded, because a unicode-range face is fetched only
-// when a glyph in its range is first painted, which is the moment the slide
-// carrying it appears, in front of an audience.
+// Slidev emits a chunk for every face the theme ships, and a built deck's text
+// is fixed, so the chunks it can ask for are known. What is kept is preloaded,
+// because a unicode-range face is otherwise fetched when its glyph is first
+// painted, which is the moment the slide appears in front of an audience.
 async function narrowDeckFonts(out, base) {
   const assets = path.join(out, 'assets')
   if (!existsSync(assets)) return
@@ -285,7 +278,6 @@ for (const name of names) {
       'png',
       '--range',
       deck.preview.join(','),
-      // Full 1920x1080, because the cover is shown near a megapixel wide.
       '--output',
       path.join(out, 'preview'),
     ])

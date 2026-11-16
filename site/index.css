@@ -2,8 +2,7 @@
   color-scheme: light;
   --cell: 30px;
   --half: calc(var(--cell) / 2);
-  /* Grey throughout. A theme's palette belongs to its slides, and the covers
-     are the only thing on this page that should carry colour. */
+  /* Grey throughout, so the covers are the only colour on the page. */
   --paper: #f6f6f6;
   --minor: #e8e8e8;
   --major: #d6d6d6;
@@ -19,8 +18,8 @@
   box-sizing: border-box;
 }
 
-/* 32 cells wide with a line on the horizontal centre, so the column's edges
-   land on lines at any viewport width, the alignment the slides are built to. */
+/* A line on the horizontal centre puts the edges of the 32-cell column on
+   lines at any viewport width. */
 body {
   margin: 0;
   padding: calc(2 * var(--cell)) var(--cell) calc(4 * var(--cell));
@@ -47,8 +46,8 @@ body {
     monospace;
 }
 
-/* The column holds a slide plus the cell of clear space the construction
-   box needs on each side, so the image itself lands on exactly 32 cells. */
+/* The extra cell on each side is the clear space the construction box needs,
+   so the image is exactly 32 cells. */
 main {
   width: min(calc(var(--slide) + 2 * var(--cell)), 100%);
   margin: 0 auto;
@@ -91,16 +90,16 @@ ul {
   margin-top: calc(4 * var(--cell));
 }
 
-/* The four are peers and the cover is not the most informative of them, so
-   they are set at one size, two cells apart. */
+/* The cover is not the most informative slide, so all of them are set at one
+   size, two cells apart. */
 .sheet {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: calc(2 * var(--cell));
 }
 
-/* The frame and its scales are absolutely positioned, so .plate measures
-   exactly the slide and the frame takes no space of its own. */
+/* The frame and its scales are absolutely positioned so .plate measures
+   exactly the slide. */
 .plate {
   position: relative;
 }
@@ -111,8 +110,8 @@ ul {
   border: 1px dashed var(--draft);
 }
 
-/* One tick a cell along the two leading edges, every fourth one long. --zoom
-   drives the periods, so the scale reads the slide at its drawn size. */
+/* --zoom is registered as a number so it can transition, and it scales the
+   tick periods so the scale reads the slide at its drawn size. */
 @property --zoom {
   syntax: '<number>';
   inherits: true;
@@ -121,12 +120,10 @@ ul {
 .ticks {
   position: absolute;
 }
-/* One tick down the middle of each tile. Centred tiles rather than tiles run
-   from a corner are what let the scale open from the middle, the marks moving
-   away from the centre line in both directions as the period grows, which a
-   gradient phased from the left edge cannot do. The long tick is 2px to the
-   short tick's 1px, so where the two tilings land a rounding apart it covers
-   the short one instead of standing beside it. */
+/* The tiles are centred rather than run from a corner so the scale opens from
+   the middle as the period grows, which a gradient phased from the left edge
+   cannot do. The long tick is 2px to the short tick's 1px so it covers the
+   short one where the two tilings land a rounding apart. */
 .ticks-x {
   top: -9px;
   right: 0;
@@ -176,13 +173,10 @@ ul {
     4px calc(var(--zoom) * 100% / var(--rows));
 }
 
-/* One value drives the hover. The slide is drawn larger inside its own frame
-   and both scales open by the same factor about the same centre line, so they
-   go on measuring what is on screen. The scales open twice where the slide
-   opens a quarter, because a rule that moved only as far as the picture read
-   as if nothing had happened; that makes the ticks a gesture rather than a
-   true scale, so the numbers stay tied to the slide. The hatched shadow
-   belongs to the loose prints and is taken off this one. */
+/* One value drives the hover. The slide is drawn larger inside its frame and
+   both scales open by the same factor about the same centre line, so they go
+   on measuring what is on screen. The hatched shadow belongs to the loose
+   prints and is taken off this one. */
 .plate {
   --zoom: 1;
   transition: --zoom 220ms ease-out;
@@ -253,9 +247,9 @@ ul {
   width: 1px;
 }
 
-/* The number says what is on screen rather than what the file is, so zoomed
-   in the rule reads less. The markup carries the unzoomed figure, so a browser
-   without the counter arithmetic still shows a measure. */
+/* The number follows what is on screen, so zoomed in the rule reads less. The
+   markup carries the unzoomed figure for browsers without the counter
+   arithmetic. */
 @supports (content: counter(measure)) and (width: round(down, 1px, 1px)) {
   .rule i {
     font-size: 0;
@@ -291,10 +285,9 @@ ul {
   font-size: 13px;
 }
 
-/* Kept in the monospace face. The rounded face would read better here, but
-   its chunks are cut fine enough that one CJK sentence pulls seventeen of
-   them, and a sentence is not worth 400 KB. Set at a reading size on a
-   measure of about 34 characters, so it is a sentence rather than two
+/* This stays in the monospace face because the rounded face's chunks are cut
+   so fine that one CJK sentence pulls seventeen of them, about 400 KB. The
+   measure of about 34 characters keeps it one sentence rather than two
    stranded fragments. */
 .about {
   max-width: calc(19 * var(--cell));
@@ -308,8 +301,8 @@ ul {
   margin-top: calc(2 * var(--cell));
 }
 
-/* Hatched and offset rather than blurred, which would be the only soft edge
-   in the drawing. Every slide in the group gets it, the cover included. */
+/* Hatched and offset rather than blurred, which would be the only soft edge in
+   the drawing. */
 .shot {
   position: relative;
   display: block;
@@ -344,8 +337,8 @@ ul {
   background: #1e1e2e;
 }
 
-/* One column, read top to bottom. Split across two it asked the reader to
-   work out whether it ran across or down. */
+/* One column, because two made the reader work out whether it ran across or
+   down. */
 .spec {
   margin: calc(2 * var(--cell)) 0 0;
   font-size: 13px;

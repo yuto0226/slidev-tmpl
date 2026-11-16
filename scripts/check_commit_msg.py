@@ -37,15 +37,11 @@ VAGUE_SUBJECTS = {
 MAX_HEADER_LENGTH = 72
 MAX_BODY_LINE_LENGTH = 72
 
-# Conventional Commits-ish header:
-# - type(scope): subject
-# - type!: subject
-# - type(scope)!: subject
+# type(scope)!: subject, with the scope and the ! both optional.
 HEADER_PATTERN = re.compile(
     r"^(?P<type>[a-z]+)(?:\((?P<scope>[a-z0-9_-]+)\))?(?P<breaking>!)?:\s(?P<subject>.*)$"
 )
 
-# Applied to the full raw message; any match causes an early-exit rejection.
 _MESSAGE_GUARDS: list[tuple[re.Pattern[str], str]] = [
     (
         re.compile(r"Co-Authored-By:.*(anthropic|claude)", re.IGNORECASE),
@@ -57,7 +53,6 @@ _MESSAGE_GUARDS: list[tuple[re.Pattern[str], str]] = [
     ),
 ]
 
-# Applied to the casefold-normalised subject; any match causes an early-exit rejection.
 _NORMALIZED_SUBJECT_GUARDS: list[tuple[re.Pattern[str], str]] = [
     (
         re.compile(r"^update\s+\S+$"),
@@ -68,7 +63,7 @@ _NORMALIZED_SUBJECT_GUARDS: list[tuple[re.Pattern[str], str]] = [
     ),
 ]
 
-# Applied to the raw subject; matches accumulate into the error list.
+# Unlike the guards above, a match here accumulates rather than rejecting at once.
 _SUBJECT_CHECKS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"[.!?]$"), "Commit subject must not end with punctuation."),
 ]
@@ -91,14 +86,12 @@ def validate_commit_message(message: str) -> ValidationResult:
     # validated as an empty subject after normalization.
     first_line = lines[0].lstrip()
 
-    # Allow autosquash prefixes.
     for prefix in ("fixup! ", "squash! "):
         stripped = first_line.removeprefix(prefix)
         if stripped != first_line:
             first_line = stripped.lstrip()
             break
 
-    # Allow merge/revert commits created by Git.
     if first_line.startswith(("Merge ", "Revert ")):
         return {"ok": True, "errors": []}
 
@@ -173,9 +166,8 @@ def validate_commit_message(message: str) -> ValidationResult:
         errors.append(
             "Commit subject must start with a lowercase imperative verb (e.g. add, fix, re-add, refactor)."
         )
+    # The length floors stop words like "red" and "bring" counting as past or gerund.
     elif (first_word.endswith("ed") and len(first_word) > 4) or (
-        # len > 4 skips short words like "red", "bed", "axed" (≤4 chars)
-        # len > 5 skips short words like "ring", "bring", "sting" (≤5 chars)
         first_word.endswith("ing") and len(first_word) > 5
     ):
         errors.append(

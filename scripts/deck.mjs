@@ -24,7 +24,6 @@ const decks = readdirSync(decksDir).filter((name) =>
 )
 if (decks.length === 0) fail('decks/ holds no deck')
 
-// A leading dash means the argument is Slidev's, not a deck name.
 const named = rest[0] && !rest[0].startsWith('-') ? rest[0] : undefined
 const args = named ? rest.slice(1) : rest
 
