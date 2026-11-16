@@ -1,0 +1,82 @@
+/* Code is set on the slide itself rather than in a panel, so the rules here
+   undo a panel's furniture and put back what a listing needs. The two
+   properties below name what a step does to a line; a view of the block can
+   answer them without restating the selectors that read them. */
+.slidev-code {
+  --tmpl-code-dim: 0.35;
+  --tmpl-code-band: var(--tmpl-highlight);
+}
+
+/* No variable reaches these two.
+
+   The CSS reset claims every code, kbd, samp and pre. Slidev answers it on the
+   fenced block's pre, but Shiki nests a code element inside that the reset
+   matches in turn, and inline code is never answered at all.
+
+   CJK has no italic, so a comment set in italic is sheared rather than drawn,
+   and comments are where Chinese appears most in code. */
+.slidev-code code,
+.slidev-layout :not(pre) > code {
+  font-family: var(--slidev-code-font-family);
+}
+
+.slidev-code,
+.slidev-code * {
+  font-style: normal;
+  font-synthesis: none;
+}
+
+/* A line is an inline span, so a background on it would stop at the last
+   glyph. A grid makes every line a row of its own, full width, and drops the
+   newlines between them, which would otherwise be rendered as well. */
+.slidev-code code {
+  display: grid;
+}
+
+/* A grid row with no content has no height, which is not what a blank line
+   in a listing looks like. */
+.slidev-code .line:empty::after {
+  content: ' ';
+}
+
+/* Slidev marks the lines a step is about and dims the rest. The band appears
+   only once some other line has been dimmed, because the first step of a
+   walk marks every line and would otherwise tint the whole block. */
+.slidev-code:has(.slidev-code-dishonored) .slidev-code-highlighted {
+  background: var(--tmpl-code-band);
+}
+
+.slidev-code .slidev-code-dishonored {
+  opacity: var(--tmpl-code-dim);
+}
+
+/* A debugger view. Its step says where execution has stopped rather than
+   what the talk is about, so no line is dimmed and the stopped one is tinted
+   the way a debugger tints it. */
+.code-debug .slidev-code {
+  --tmpl-code-dim: 1;
+  --tmpl-code-band: var(--tmpl-breakpoint-row);
+}
+
+/* A line ending in `// [!code bp]` is one a debugger was told to stop at. Its
+   dot sits out in a gutter, where a debugger puts it, which is the margin
+   the block opens on the left. */
+.code-debug .slidev-code code {
+  padding-left: var(--tmpl-gutter);
+}
+
+.code-debug .slidev-code .code-breakpoint {
+  position: relative;
+}
+
+.code-debug .slidev-code .code-breakpoint::after {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--tmpl-gutter));
+  top: 50%;
+  translate: 0 -50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--tmpl-breakpoint-dot);
+}
