@@ -11,6 +11,14 @@ const props = defineProps({
 
 const WIDTH = 16
 
+// Which bytes carry the gaps that group the row. Naming them by index keeps
+// WIDTH the only place the row's shape is stated.
+const edge = (i) => ({
+  'memory-first': i === 0,
+  'memory-mid': i === WIDTH / 2,
+  'memory-last': i === WIDTH - 1,
+})
+
 // A heading is a column number, not a byte, so it is set in the width of one
 // without the leading zero a byte would carry.
 const columns = Array.from({ length: WIDTH }, (_, i) =>
@@ -55,14 +63,16 @@ const rows = computed(() => {
       <thead>
         <tr>
           <th class="memory-addr diagram-addr">addr</th>
-          <th v-for="column in columns" :key="column">{{ column }}</th>
+          <th v-for="(column, i) in columns" :key="column" :class="edge(i)">{{ column }}</th>
           <th v-if="ascii" class="memory-ascii">ascii</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="row in rows" :key="row.addr">
           <th class="memory-addr diagram-addr">{{ row.addr }}</th>
-          <td v-for="(cell, i) in row.cells" :key="i" :class="cell.class">{{ cell.hex }}</td>
+          <td v-for="(cell, i) in row.cells" :key="i" :class="[cell.class, edge(i)]">
+            {{ cell.hex }}
+          </td>
           <td v-if="ascii" class="memory-ascii">
             <span v-for="(cell, i) in row.cells" :key="i" :class="cell.class">{{
               cell.glyph
@@ -119,27 +129,25 @@ const rows = computed(() => {
   white-space: pre;
 }
 
-/* The address takes the first cell of a row, so the bytes are the second
-   through the seventeenth. A gap beside a rule, or at the halfway mark, is a
-   transparent border rather than padding, because a cell paints its
-   background out to the padding's edge: as padding it would be swallowed by
-   a marked byte's band, which would then start a gap early and sit out of
-   line with its column. */
-.memory-dump tr > :nth-child(2),
-.memory-dump tr > :nth-child(10),
-.memory-dump tr > :nth-child(17) {
+/* The gaps are transparent borders rather than padding, because a cell paints
+   its background out to the padding's edge. As padding the gap would be
+   swallowed by a marked byte's band, which would then start early and sit out
+   of line with its column. */
+.memory-dump .memory-first,
+.memory-dump .memory-mid,
+.memory-dump .memory-last {
   background-clip: padding-box;
 }
 
-.memory-dump tr > :nth-child(2) {
+.memory-dump .memory-first {
   border-left: 0.5ch solid transparent;
 }
 
-.memory-dump tr > :nth-child(10) {
+.memory-dump .memory-mid {
   border-left: 1ch solid transparent;
 }
 
-.memory-dump tr > :nth-child(17) {
+.memory-dump .memory-last {
   border-right: 0.5ch solid transparent;
 }
 
