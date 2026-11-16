@@ -1,0 +1,16 @@
+/* The stack frame and the memory dump are one drawing in two shapes: hex
+   addresses down the left, data beside them, ruled at one weight, with one
+   colour for whatever a talk is pointing at. What they share is stated here
+   so neither can drift from the other; each keeps its own structure. */
+.diagram {
+  font-family: var(--slidev-code-font-family);
+}
+
+.diagram-addr {
+  color: var(--tmpl-muted);
+}
+
+.diagram-mark {
+  background-color: var(--tmpl-mark);
+  color: var(--tmpl-bg);
+}
