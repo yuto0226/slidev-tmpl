@@ -1,0 +1,87 @@
+/* The furniture a content page carries: the title band, the body box below
+   it, and the markers inside that box. A layout states where its boxes are;
+   what goes in them is the same on every page.
+
+   Boxes are placed in slide units, which are points. */
+
+.tmpl-page h1 {
+  position: absolute;
+  left: 66px;
+  top: 56.5px;
+  width: 828px;
+  height: 73.12px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--tmpl-inset-y) var(--tmpl-inset-x);
+  font-size: var(--tmpl-title-size);
+  font-weight: 700;
+  line-height: var(--tmpl-line);
+}
+
+/* Every content page is a command typed at a prompt. */
+.tmpl-page h1::before {
+  content: '$';
+  color: var(--tmpl-prompt);
+}
+
+/* The body box carries the title's heading, so it is placed by its margins
+   rather than by offsets: an offset box would become the heading's frame and
+   take it along. A second box on the same page has no heading in it and is
+   placed directly. */
+.tmpl-body {
+  margin: 142.38px 0 0 66px;
+  width: 828px;
+  height: 344px;
+  padding: var(--tmpl-inset-y) var(--tmpl-inset-x);
+}
+
+/* The indent is the list's, so the marker hangs outside it and wrapped text
+   lines up under the first line rather than under the marker. The CSS reset
+   drops the marker, and revert brings the browser's own back. */
+.tmpl-body :where(ul, ol) {
+  margin: 0;
+  padding-left: var(--tmpl-indent);
+  list-style: revert;
+}
+
+/* Each level steps in by 36 points. */
+.tmpl-body :where(ul, ol) :where(ul, ol) {
+  padding-left: 36px;
+}
+
+/* The outline page is a bulleted list whose text opens with a number in the
+   mark colour, so the number goes before the text and the marker stays the
+   same as any other list's. As the marker it would be wider than the indent
+   it hangs in and would overrun the box. */
+.tmpl-body ol {
+  list-style-type: disc;
+}
+
+.tmpl-body ol > li::before {
+  content: counter(list-item, decimal-leading-zero) ' ';
+  color: var(--tmpl-mark);
+}
+
+/* Every paragraph but the first in a box opens with a gap, and a nested one
+   opens with half of it. */
+.tmpl-body p,
+.tmpl-body > :where(ul, ol) > li {
+  margin-top: var(--tmpl-para-gap);
+}
+
+.tmpl-body :where(ul, ol) :where(ul, ol) > li {
+  margin-top: calc(var(--tmpl-para-gap) / 2);
+}
+
+/* The heading sits on the slide rather than in the box, so the box's first
+   paragraph is the one that follows it. */
+.tmpl-body > :first-child,
+.tmpl-body > h1:first-child + * {
+  margin-top: 0;
+}
+
+.tmpl-body > :where(ul, ol):first-child > li:first-child,
+.tmpl-body > h1:first-child + :where(ul, ol) > li:first-child {
+  margin-top: 0;
+}

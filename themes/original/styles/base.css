@@ -1,0 +1,83 @@
+/* Slidev's --slidev-* variables are its theming contract. Bind them to the
+   palette here; reach for a selector only where no variable exists.
+
+   html:root rather than :root, because Slidev defines the same names on :root
+   and its stylesheet loads after this one. */
+html:root {
+  --tmpl-bg: #1e1e2e;
+  --tmpl-surface: #181825;
+  --tmpl-fg: #ffffff;
+  --tmpl-muted: #bac2de;
+  --tmpl-accent: #89b3fa;
+  --tmpl-mark: #cba6f7;
+  --tmpl-prompt: #e64553;
+  --tmpl-page: #cdd6f4;
+  --tmpl-highlight: #2f2f48;
+  /* A rule or a box edge in a diagram, and the same edge before anything
+     fills the box. Opaque, because two translucent edges meeting would read
+     as one darker line. */
+  --tmpl-rule: #5c6074;
+  --tmpl-rule-dim: #353748;
+  --tmpl-rule-width: 2px;
+  --tmpl-breakpoint-row: rgb(255 80 80 / 40%);
+  --tmpl-breakpoint-dot: #c00000;
+  /* The margin a debugger's breakpoint dot sits out in. */
+  --tmpl-gutter: 18px;
+
+  /* The canvas is 960 units wide for a 16/9 slide, so one unit is one point
+     and every size below is the point size it is set in. */
+  --tmpl-title-size: 48px;
+  --tmpl-display-size: 54px;
+  --tmpl-body-size: 24px;
+  --tmpl-page-size: 12px;
+
+  /* A single-spaced line is 1.2 times the font size, and the design sets
+     every line to 90% of that. The paragraph gap is not applied above the
+     first paragraph of a box. */
+  --tmpl-line: 1.08;
+  --tmpl-para-gap: 10px;
+  --tmpl-indent: 27px;
+
+  /* A text box insets its content unless it says otherwise. */
+  --tmpl-inset-x: 7.2px;
+  --tmpl-inset-y: 3.6px;
+
+  /* A box anchored to an edge places its first or last line by the font's
+     Windows ascent and descent, which run 0.06 em beyond the typographic
+     ones a browser lays out with. Half of the leading comes back the other
+     way, leaving this much to add. */
+  --tmpl-anchor-gap: 0.02em;
+
+  --slidev-theme-primary: var(--tmpl-accent);
+  /* Code is set on the slide itself rather than in a panel. */
+  --slidev-code-background: transparent;
+  --slidev-code-foreground: var(--tmpl-fg);
+  --slidev-code-padding: 0;
+  --slidev-code-margin: 0;
+  --slidev-code-radius: 0;
+  --slidev-code-font-size: 14px;
+  --slidev-code-line-height: 1.5;
+}
+
+/* Filling the canvas is the theme's job. Without a height the layout is only
+   as tall as its content. A layout places its own boxes, so there is nothing
+   to pad here. */
+.slidev-layout {
+  position: relative;
+  /* A box placed by its top margin would otherwise push the whole slide
+     down with it. */
+  display: flow-root;
+  height: 100%;
+  padding: 0;
+  background: var(--tmpl-bg);
+  color: var(--tmpl-fg);
+  font-size: var(--tmpl-body-size);
+  line-height: var(--tmpl-line);
+  font-weight: 500;
+}
+
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3 {
+  font-weight: 700;
+}
