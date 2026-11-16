@@ -11,22 +11,24 @@
 </template>
 
 <style>
-/* Four cells in from each edge, so the block is narrower than a content
-   page's and reads as a different kind of slide. */
+/* A cover and a section are the same page: a title with a line of text under
+   it. The pair is ten cells tall and centred on the slide, which leaves four
+   clear above and below; the title takes six of them and the text four. A
+   cover centres its text and a section ranges it left.
+
+   The title is anchored to its bottom edge, so it grows upwards and the gap
+   to the text below stays fixed however many lines it takes. */
 .cover-title,
 .cover-subtitle {
   position: absolute;
-  left: calc(4 * var(--tmpl-cell));
-  width: calc(960px - 8 * var(--tmpl-cell));
+  left: var(--tmpl-margin);
+  width: var(--tmpl-content-width);
   text-align: center;
 }
 
-/* The box is anchored to its bottom edge, so the title grows upwards and the
-   gap to the subtitle stays fixed however many lines it takes. Two lines of
-   display type fill it exactly. */
 .cover-title {
-  top: calc(5 * var(--tmpl-cell));
-  height: calc(5 * var(--tmpl-cell));
+  top: calc(4 * var(--tmpl-cell));
+  height: calc(6 * var(--tmpl-cell));
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -36,7 +38,7 @@
 
 .cover-subtitle {
   top: calc(10 * var(--tmpl-cell));
-  height: calc(3 * var(--tmpl-cell));
+  height: calc(4 * var(--tmpl-cell));
   font-size: var(--tmpl-subtitle-size);
   color: var(--tmpl-muted);
 }

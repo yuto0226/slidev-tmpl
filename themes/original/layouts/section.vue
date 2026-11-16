@@ -8,19 +8,27 @@
 </template>
 
 <style>
-/* The bar takes the first cell, so the text starts at the fifth rather than
-   at a content page's second. The title is anchored to its bottom edge and
-   grows upwards; the body hangs under that edge.
+/* The same ten-cell block as a cover, ranged left instead of centred: the
+   title takes six cells and the text under it four, and the pair is centred
+   on the slide. The bar takes the first cell, so the text starts one cell
+   further in than a content page's margin.
 
    The heading is a child of the body box but is placed against the slide, so
    the body box stays in flow: an absolute body box would become the frame the
    heading is measured from. */
+/* The heading is placed and the body box flows, so they cannot share a
+   declaration: one takes the offset as left, the other as a margin. */
+.section {
+  --section-x: calc(var(--tmpl-cell) + var(--tmpl-margin));
+  --section-width: calc(960px - var(--tmpl-cell) - 2 * var(--tmpl-margin));
+}
+
 .section h1 {
   position: absolute;
-  left: calc(5 * var(--tmpl-cell));
+  left: var(--section-x);
+  width: var(--section-width);
   top: calc(4 * var(--tmpl-cell));
-  width: calc(960px - 5 * var(--tmpl-cell) - var(--tmpl-margin));
-  height: calc(7 * var(--tmpl-cell));
+  height: calc(6 * var(--tmpl-cell));
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -31,8 +39,8 @@
 }
 
 .section-body {
-  margin: calc(11 * var(--tmpl-cell)) 0 0 calc(5 * var(--tmpl-cell));
-  width: calc(960px - 5 * var(--tmpl-cell) - var(--tmpl-margin));
+  margin: calc(10 * var(--tmpl-cell)) 0 0 var(--section-x);
+  width: var(--section-width);
   height: calc(4 * var(--tmpl-cell));
 }
 
