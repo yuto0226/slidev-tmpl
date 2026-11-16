@@ -9,9 +9,9 @@
 
 <style>
 /* The same ten-cell block as a cover, ranged left instead of centred: the
-   title takes six cells and the text under it four, and the pair is centred
-   on the slide. The bar takes the first cell, so the text starts one cell
-   further in than a content page's margin.
+   title takes six cells and the text under it four, three cells down from
+   the top. The text starts three cells in, which clears the bar along the
+   left edge.
 
    The heading is a child of the body box but is placed against the slide, so
    the body box stays in flow: an absolute body box would become the frame the
@@ -19,15 +19,15 @@
 /* The heading is placed and the body box flows, so they cannot share a
    declaration: one takes the offset as left, the other as a margin. */
 .section {
-  --section-x: calc(var(--tmpl-cell) + var(--tmpl-margin));
-  --section-width: calc(960px - var(--tmpl-cell) - 2 * var(--tmpl-margin));
+  --section-x: calc(3 * var(--tmpl-cell));
+  --section-width: calc(960px - 3 * var(--tmpl-cell) - var(--tmpl-margin));
 }
 
 .section h1 {
   position: absolute;
   left: var(--section-x);
   width: var(--section-width);
-  top: calc(4 * var(--tmpl-cell));
+  top: calc(3 * var(--tmpl-cell));
   height: calc(6 * var(--tmpl-cell));
   margin: 0;
   display: flex;
@@ -39,7 +39,7 @@
 }
 
 .section-body {
-  margin: calc(10 * var(--tmpl-cell)) 0 0 var(--section-x);
+  margin: calc(9 * var(--tmpl-cell)) 0 0 var(--section-x);
   width: var(--section-width);
   height: calc(4 * var(--tmpl-cell));
 }
@@ -54,7 +54,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: var(--tmpl-cell);
+  width: var(--tmpl-half);
   height: 540px;
   background: var(--tmpl-mark);
 }
