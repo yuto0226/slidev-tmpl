@@ -135,7 +135,8 @@ watch(guideLevel, () => requestAnimationFrame(measure))
 
 /* A box edge cuts the whole slide, so anything else on the slide can be lined
    up against it and not only against the box it came from. The margin is the
-   frame the boxes sit in rather than one of them, so it is drawn apart.
+   frame the boxes sit in rather than one of them, and it is the one line that
+   is the same on every slide, so it is drawn colourless and recedes.
 
    These colours are literals, not tokens: an authoring aid that took the
    theme's palette would disappear against a slide using the same colours. */
@@ -151,7 +152,7 @@ watch(guideLevel, () => requestAnimationFrame(measure))
 }
 
 .tmpl-guides-margin {
-  --tmpl-guides-ink: #f9e2af;
+  --tmpl-guides-ink: rgb(255 255 255 / 45%);
 }
 
 .tmpl-guides-col {
