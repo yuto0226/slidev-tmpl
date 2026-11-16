@@ -13,7 +13,7 @@
   top: calc(7 * var(--tmpl-cell));
   width: 1200px;
   height: calc(4 * var(--tmpl-cell));
-  transform: rotate(-18.426deg);
+  transform: rotate(calc(-1 * atan(1 / 3)));
   display: flex;
   align-items: center;
   justify-content: center;

@@ -45,11 +45,6 @@
   list-style: revert;
 }
 
-/* Each level steps in by one cell. */
-.tmpl-body :where(ul, ol) :where(ul, ol) {
-  padding-left: var(--tmpl-indent);
-}
-
 /* The outline page is a bulleted list whose text opens with a number in the
    mark colour, so the number goes before the text and the marker stays the
    same as any other list's. As the marker it would be wider than the indent

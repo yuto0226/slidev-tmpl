@@ -5,7 +5,7 @@ layout: cover
 subtitle: 這是簡報的副標題
 # Shown on the theme index: a cover, a banner over body copy, a code
 # block, a diagram component.
-preview: [1, 4, 7, 9]
+preview: [1, 4, 6, 8]
 ---
 
 # 這是簡報的標題
@@ -64,19 +64,6 @@ layout: content
   - Sub item
 
 <Banner>Pwned</Banner>
-
----
-layout: content
----
-
-# 標題
-
-新增少量內文
-
-- List item
-- List item
-  - Sub item
-  - Sub item
 
 ---
 layout: section
@@ -183,6 +170,6 @@ layout: two-cols
 layout: section
 ---
 
-# Happing Hacking
+# Happy Hacking
 
 you@example.com

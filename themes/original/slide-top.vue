@@ -7,24 +7,26 @@ const authoring = import.meta.env.DEV
 const root = ref(null)
 const cols = ref([])
 const rows = ref([])
-const marginCols = ref([])
-const marginRows = ref([])
 
 /* Every edge of every box the layout placed, read back from the slide rather
-   than listed here, so a layout gets its lines by existing. The margin is
-   measured from its token rather than from an element, because no element
-   stands for it, and a box edge that lands on it is dropped so the margin
-   keeps its own colour there. */
+   than listed here, so adding a layout needs nothing here.
+
+   The overlay is laid out in slide units and shown scaled, so offsetWidth is
+   the slide's own 960 and the ratio between the two converts a measurement
+   back. */
 function measure() {
   const el = root.value
   if (!el) return
   const slide = el.getBoundingClientRect()
-  const scale = slide.width / 960
+  const scale = slide.width / el.offsetWidth
   if (!scale) return
 
+  // The margin is drawn in CSS, and a box edge that lands on it is dropped
+  // here so the line keeps its own colour rather than showing blue through a
+  // translucent white.
   const margin = Number.parseFloat(getComputedStyle(el).getPropertyValue('--tmpl-margin'))
-  marginCols.value = [margin, 960 - margin]
-  marginRows.value = [margin, 540 - margin]
+  const edges = [margin, el.offsetWidth - margin]
+  const sides = [margin, el.offsetHeight - margin]
 
   const x = new Set()
   const y = new Set()
@@ -36,31 +38,30 @@ function measure() {
     y.add(Math.round((r.top - slide.top) / scale))
     y.add(Math.round((r.bottom - slide.top) / scale))
   }
-  cols.value = [...x].filter((at) => !marginCols.value.includes(at)).sort((a, b) => a - b)
-  rows.value = [...y].filter((at) => !marginRows.value.includes(at)).sort((a, b) => a - b)
+  cols.value = [...x].filter((at) => !edges.includes(at)).sort((a, b) => a - b)
+  rows.value = [...y].filter((at) => !sides.includes(at)).sort((a, b) => a - b)
 }
 
 /* Slidev mounts every slide at once and hides all but the current one with
    v-show, so this runs first against a display: none slide that measures
    zero. Observing the size covers that, because becoming visible is a resize;
    toggling the guides is not, so it still asks on its own. */
-onMounted(() => {
-  const observer = new ResizeObserver(measure)
-  observer.observe(root.value)
-  onUnmounted(() => observer.disconnect())
-})
+const observer = authoring ? new ResizeObserver(measure) : null
+
+onMounted(() => observer?.observe(root.value))
+onUnmounted(() => observer?.disconnect())
 
 watch(guideLevel, () => requestAnimationFrame(measure))
 </script>
 
 <template>
   <!-- Slidev renders this layer inside every slide, so the overlay shares the
-       slide's 960 by 540 coordinate space and scales with it: a line drawn at
-       30px lands on the same cell the layout was placed in. -->
-  <div v-if="authoring" ref="root" class="tmpl-guides" :class="{ 'tmpl-guides-on': guideLevel }">
+       slide's coordinate space and scales with it, and a line drawn at 30px
+       lands on the cell the layout was placed in. -->
+  <div v-if="authoring" ref="root" class="tmpl-guides">
     <template v-if="guideLevel">
-      <div v-if="guideLevel === 2" class="tmpl-guides-halves" />
-      <div class="tmpl-guides-cells" />
+      <div v-if="guideLevel === 2" class="tmpl-guides-grid tmpl-guides-halves" />
+      <div class="tmpl-guides-grid tmpl-guides-cells" />
       <div
         v-for="at in cols"
         :key="`c${at}`"
@@ -68,17 +69,15 @@ watch(guideLevel, () => requestAnimationFrame(measure))
         :style="{ left: `${at}px` }"
       />
       <div v-for="at in rows" :key="`r${at}`" class="tmpl-guides-row" :style="{ top: `${at}px` }" />
+      <div class="tmpl-guides-col tmpl-guides-margin" style="left: var(--tmpl-margin)" />
       <div
-        v-for="at in marginCols"
-        :key="`mc${at}`"
         class="tmpl-guides-col tmpl-guides-margin"
-        :style="{ left: `${at}px` }"
+        style="left: calc(100% - var(--tmpl-margin))"
       />
+      <div class="tmpl-guides-row tmpl-guides-margin" style="top: var(--tmpl-margin)" />
       <div
-        v-for="at in marginRows"
-        :key="`mr${at}`"
         class="tmpl-guides-row tmpl-guides-margin"
-        :style="{ top: `${at}px` }"
+        style="top: calc(100% - var(--tmpl-margin))"
       />
     </template>
   </div>
@@ -91,55 +90,43 @@ watch(guideLevel, () => requestAnimationFrame(measure))
   pointer-events: none;
 }
 
-/* The overlay has to be measurable before it has anything to draw, so it is
-   always in the slide and only its contents come and go. */
-.tmpl-guides:not(.tmpl-guides-on) {
-  visibility: hidden;
+/* One repeating gradient an axis draws a whole grid without a node per line.
+   Half cells are where a line of text actually lands, so they are drawn under
+   the cells rather than instead of them. */
+.tmpl-guides-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      rgb(255 255 255 / var(--tmpl-guides-alpha)) 0 1px,
+      transparent 1px var(--tmpl-guides-step)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgb(255 255 255 / var(--tmpl-guides-alpha)) 0 1px,
+      transparent 1px var(--tmpl-guides-step)
+    );
 }
 
-/* Half cells are where a line of text actually lands, so they are drawn
-   under the cells rather than instead of them. */
 .tmpl-guides-halves {
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      to right,
-      rgb(255 255 255 / 5%) 0 1px,
-      transparent 1px var(--tmpl-half)
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      rgb(255 255 255 / 5%) 0 1px,
-      transparent 1px var(--tmpl-half)
-    );
+  --tmpl-guides-alpha: 5%;
+  --tmpl-guides-step: var(--tmpl-half);
 }
 
-/* One gradient stop per axis draws the whole 32 by 18 grid without a node
-   per line. */
 .tmpl-guides-cells {
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      to right,
-      rgb(255 255 255 / 10%) 0 1px,
-      transparent 1px var(--tmpl-cell)
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      rgb(255 255 255 / 10%) 0 1px,
-      transparent 1px var(--tmpl-cell)
-    );
+  --tmpl-guides-alpha: 10%;
+  --tmpl-guides-step: var(--tmpl-cell);
 }
 
-/* A box edge cuts the whole slide, so anything else on the slide can be lined
-   up against it and not only against the box it came from. The margin is the
-   frame the boxes sit in rather than one of them, and it is the one line that
-   is the same on every slide, so it is drawn colourless and recedes.
+/* A box edge cuts the whole slide, so anything else can be lined up against
+   it and not only against the box it came from. The margin is the frame the
+   boxes sit in rather than one of them, and it is the same on every slide, so
+   it is drawn colourless and recedes. It comes last, which covers a box edge
+   that lands on it.
 
-   These colours are literals, not tokens: an authoring aid that took the
-   theme's palette would disappear against a slide using the same colours. */
+   These colours are literals rather than tokens. An authoring aid that took
+   the theme's palette would disappear against a slide using those colours. */
 .tmpl-guides-col,
 .tmpl-guides-row {
   position: absolute;
@@ -158,13 +145,13 @@ watch(guideLevel, () => requestAnimationFrame(measure))
 .tmpl-guides-col {
   top: 0;
   width: 1px;
-  height: 540px;
+  height: 100%;
   --tmpl-guides-along: to bottom;
 }
 
 .tmpl-guides-row {
   left: 0;
-  width: 960px;
+  width: 100%;
   height: 1px;
   --tmpl-guides-along: to right;
 }

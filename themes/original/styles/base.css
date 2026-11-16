@@ -3,9 +3,17 @@
 
    html:root rather than :root, because Slidev defines the same names on :root
    and its stylesheet loads after this one. */
+/* An unregistered custom property reads back as the text that was written, so
+   a calc() reaches script as a string. Declaring the type makes the computed
+   value a length everywhere, script included. */
+@property --tmpl-margin {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
 html:root {
   --tmpl-bg: #1e1e2e;
-  --tmpl-surface: #181825;
   --tmpl-fg: #ffffff;
   --tmpl-muted: #bac2de;
   --tmpl-accent: #89b3fa;
@@ -24,16 +32,17 @@ html:root {
   /* The margin a debugger's breakpoint dot sits out in. */
   --tmpl-gutter: 18px;
 
-  /* The canvas is 960 by 540 slide units and a unit is a point. 30 is the
-     largest number that divides both, so a 30pt cell is the only square that
-     tiles the whole slide: 32 columns across, 18 rows down. Every box in the
-     theme is placed and sized in whole cells, and the half cell is what text
-     inside a box moves by. */
+  --tmpl-canvas-width: 960px;
+  --tmpl-canvas-height: 540px;
+
+  /* A cell is one line of body text, 24pt set at 1.25, and it divides the
+     canvas into 32 columns by 18 rows. Every box in the theme is placed and
+     sized in whole cells, so a box and the text in it land on the same
+     lines. The half cell is what text inside a box moves by. */
   --tmpl-cell: 30px;
-  --tmpl-half: 15px;
-  /* Two cells on every edge. */
-  --tmpl-margin: 60px;
-  --tmpl-content-width: calc(960px - 2 * var(--tmpl-margin));
+  --tmpl-half: calc(var(--tmpl-cell) / 2);
+  --tmpl-margin: calc(2 * var(--tmpl-cell));
+  --tmpl-content-width: calc(var(--tmpl-canvas-width) - 2 * var(--tmpl-margin));
 
   /* Every size is a multiple of 12, so a line at 1.25 is a multiple of the
      half cell. What lands on the grid is the line box: CSS has no baseline of

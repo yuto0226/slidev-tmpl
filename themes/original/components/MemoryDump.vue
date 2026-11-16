@@ -151,9 +151,9 @@ const rows = computed(() => {
   color: color-mix(in srgb, var(--tmpl-muted) 60%, var(--tmpl-bg));
 }
 
-/* A marked byte keeps the half character of cell on either side of it; a
-   marked character is just the character, because the ascii column has no
-   gap between its characters for a band to reach into. */
+/* A marked byte reads against its band. This has to stay after the
+   unprintable rule, which it ties on specificity, so that a byte which is
+   both reads as marked. */
 .memory-dump .diagram-mark {
   color: var(--tmpl-bg);
 }
