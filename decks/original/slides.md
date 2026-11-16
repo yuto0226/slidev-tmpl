@@ -3,6 +3,9 @@ theme: ../../themes/original
 title: Original
 layout: cover
 subtitle: 這是簡報的副標題
+# Shown on the theme index: a cover, a banner over body copy, a code
+# block, a diagram component.
+preview: [1, 4, 7, 9]
 ---
 
 # 這是簡報的標題

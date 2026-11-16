@@ -1,19 +1,16 @@
-# node
 node_modules/
+# Every deck builds its own, and so does the site, so this stays unanchored.
 dist/
 
-# fonts fetched and split by scripts/fetch-fonts.mjs
 .cache/
 themes/*/styles/fonts/
 themes/*/styles/fonts.css
 
-# slidev export output
 *.pdf
 *.pptx
 export/
 .slidev/
 
-# python (pre-commit/uv tooling)
 .venv/
 __pycache__/
 .ruff_cache/

@@ -10,12 +10,16 @@
     "dev": "pnpm fonts:check && node scripts/deck.mjs dev",
     "build": "pnpm fonts:check && node scripts/deck.mjs build",
     "export": "pnpm fonts:check && node scripts/deck.mjs export",
+    "site": "pnpm fonts:check && node site/build.mjs",
+    "site:index": "node site/build.mjs --index-only",
+    "site:serve": "pnpm dlx serve dist",
     "fonts": "node scripts/fetch-fonts.mjs",
     "fonts:check": "node scripts/fetch-fonts.mjs --check",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@slidev/parser": "^53.1.0",
     "@slidev/types": "^53.1.0",
     "adm-zip": "^0.6.1",
     "cn-font-split": "^7.4.3",

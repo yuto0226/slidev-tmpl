@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Base Slidev theme",
+  "description": "資安與系統技術的教學、分享與研討會簡報。深色底，內建程式碼、記憶體和堆疊圖等講解用的元件。",
   "keywords": [
     "slidev-theme",
     "slidev"

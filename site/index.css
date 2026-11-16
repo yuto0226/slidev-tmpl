@@ -1,0 +1,409 @@
+:root {
+  color-scheme: light;
+  --cell: 30px;
+  --half: calc(var(--cell) / 2);
+  /* Grey throughout. A theme's palette belongs to its slides, and the covers
+     are the only thing on this page that should carry colour. */
+  --paper: #f6f6f6;
+  --minor: #e8e8e8;
+  --major: #d6d6d6;
+  --ink: #1a1a1a;
+  /* Muted text at 4.8:1 on the paper. The drawn lines carry no words, so
+     they sit lighter, at the 3:1 a graphic needs. */
+  --pencil: #6e6e6e;
+  --draft: #8c8c8c;
+  --slide: 960px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 32 cells wide with a line on the horizontal centre, so the column's edges
+   land on lines at any viewport width, the alignment the slides are built to. */
+body {
+  margin: 0;
+  padding: calc(2 * var(--cell)) var(--cell) calc(4 * var(--cell));
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right, var(--minor) 0 1px, transparent 1px),
+    linear-gradient(to bottom, var(--minor) 0 1px, transparent 1px),
+    linear-gradient(to right, var(--major) 0 1px, transparent 1px),
+    linear-gradient(to bottom, var(--major) 0 1px, transparent 1px);
+  background-size:
+    var(--cell) var(--cell),
+    var(--cell) var(--cell),
+    calc(8 * var(--cell)) calc(8 * var(--cell)),
+    calc(8 * var(--cell)) calc(8 * var(--cell));
+  background-position:
+    calc(50% + var(--cell) / 2) 0,
+    0 0,
+    calc(50% + 4 * var(--cell)) 0,
+    0 0;
+  color: var(--ink);
+  font:
+    400 15px/1.6 var(--mono),
+    ui-monospace,
+    monospace;
+}
+
+/* The column holds a slide plus the cell of clear space the construction
+   box needs on each side, so the image itself lands on exactly 32 cells. */
+main {
+  width: min(calc(var(--slide) + 2 * var(--cell)), 100%);
+  margin: 0 auto;
+  padding: 0 var(--cell);
+}
+a {
+  color: inherit;
+  transition:
+    color 140ms ease-out,
+    text-decoration-color 140ms ease-out;
+}
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+header {
+  margin-bottom: calc(2 * var(--cell));
+}
+h1 {
+  margin: 0;
+  font-family: var(--sans), ui-sans-serif, sans-serif;
+  font-weight: 700;
+  font-size: 48px;
+  line-height: var(--cell);
+  letter-spacing: 0.01em;
+}
+header p {
+  margin: calc(var(--cell) / 2) 0 0;
+  color: var(--pencil);
+  letter-spacing: 0.02em;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.theme + .theme {
+  margin-top: calc(4 * var(--cell));
+}
+
+/* The four are peers and the cover is not the most informative of them, so
+   they are set at one size, two cells apart. */
+.sheet {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: calc(2 * var(--cell));
+}
+
+/* The frame and its scales are absolutely positioned, so .plate measures
+   exactly the slide and the frame takes no space of its own. */
+.plate {
+  position: relative;
+}
+.plate::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--cell));
+  border: 1px dashed var(--draft);
+}
+
+/* One tick a cell along the two leading edges, every fourth one long. --zoom
+   drives the periods, so the scale reads the slide at its drawn size. */
+@property --zoom {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+.ticks {
+  position: absolute;
+}
+/* One tick down the middle of each tile. Centred tiles rather than tiles run
+   from a corner are what let the scale open from the middle, the marks moving
+   away from the centre line in both directions as the period grows, which a
+   gradient phased from the left edge cannot do. The long tick is 2px to the
+   short tick's 1px, so where the two tilings land a rounding apart it covers
+   the short one instead of standing beside it. */
+.ticks-x {
+  top: -9px;
+  right: 0;
+  left: 0;
+  height: 8px;
+  background-repeat: repeat-x;
+  background-position: center bottom;
+  background-image:
+    linear-gradient(
+      to right,
+      transparent calc(50% - 1px),
+      var(--draft) calc(50% - 1px) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(
+      to right,
+      transparent calc(50% - 0.5px),
+      var(--draft) calc(50% - 0.5px) calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    );
+  background-size:
+    calc(var(--zoom) * 400% / var(--columns)) 8px,
+    calc(var(--zoom) * 100% / var(--columns)) 4px;
+}
+.ticks-y {
+  top: 0;
+  bottom: 0;
+  left: -9px;
+  width: 8px;
+  background-repeat: repeat-y;
+  background-position: right center;
+  background-image:
+    linear-gradient(
+      to bottom,
+      transparent calc(50% - 1px),
+      var(--draft) calc(50% - 1px) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(50% - 0.5px),
+      var(--draft) calc(50% - 0.5px) calc(50% + 0.5px),
+      transparent calc(50% + 0.5px)
+    );
+  background-size:
+    8px calc(var(--zoom) * 400% / var(--rows)),
+    4px calc(var(--zoom) * 100% / var(--rows));
+}
+
+/* One value drives the hover. The slide is drawn larger inside its own frame
+   and both scales open by the same factor about the same centre line, so they
+   go on measuring what is on screen. The scales open twice where the slide
+   opens a quarter, because a rule that moved only as far as the picture read
+   as if nothing had happened; that makes the ticks a gesture rather than a
+   true scale, so the numbers stay tied to the slide. The hatched shadow
+   belongs to the loose prints and is taken off this one. */
+.plate {
+  --zoom: 1;
+  transition: --zoom 220ms ease-out;
+}
+.plate:has(.shot:hover),
+.plate:has(.shot:focus-visible) {
+  --zoom: 1.4;
+}
+.plate .shot {
+  overflow: hidden;
+}
+.plate .shot::before {
+  content: none;
+}
+.plate .shot img {
+  transform: scale(var(--zoom));
+  transition: none;
+}
+
+.rule {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--draft);
+}
+.rule i {
+  position: relative;
+  z-index: 1;
+  padding: 0 6px;
+  background: var(--paper);
+  color: var(--pencil);
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+.rule::before {
+  content: '';
+  position: absolute;
+  background: var(--draft);
+}
+.rule-x {
+  right: 0;
+  bottom: calc(-1 * var(--cell));
+  left: 0;
+  height: var(--cell);
+  border-left: 1px solid var(--draft);
+  border-right: 1px solid var(--draft);
+}
+.rule-x::before {
+  top: calc(50% - 0.5px);
+  right: 0;
+  left: 0;
+  height: 1px;
+}
+.rule-y {
+  top: 0;
+  right: calc(-1 * var(--cell));
+  bottom: 0;
+  width: var(--cell);
+  border-top: 1px solid var(--draft);
+  border-bottom: 1px solid var(--draft);
+}
+.rule-y::before {
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 0.5px);
+  width: 1px;
+}
+
+/* The number says what is on screen rather than what the file is, so zoomed
+   in the rule reads less. The markup carries the unzoomed figure, so a browser
+   without the counter arithmetic still shows a measure. */
+@supports (content: counter(measure)) and (width: round(down, 1px, 1px)) {
+  .rule i {
+    font-size: 0;
+  }
+  .rule i::after {
+    counter-reset: measure calc(round(down, var(--measure) / var(--zoom), 1));
+    content: counter(measure);
+    font-size: 11px;
+  }
+}
+
+.name {
+  font-size: inherit;
+  font-weight: inherit;
+  display: flex;
+  align-items: baseline;
+  gap: var(--cell);
+  margin: 0;
+}
+.name a:hover,
+.name a:focus-visible {
+  text-decoration-color: var(--ink);
+}
+.name a {
+  font-family: var(--sans), ui-sans-serif, sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  text-decoration-color: var(--draft);
+  text-underline-offset: 6px;
+}
+.name span {
+  color: var(--pencil);
+  font-size: 13px;
+}
+
+/* Kept in the monospace face. The rounded face would read better here, but
+   its chunks are cut fine enough that one CJK sentence pulls seventeen of
+   them, and a sentence is not worth 400 KB. Set at a reading size on a
+   measure of about 34 characters, so it is a sentence rather than two
+   stranded fragments. */
+.about {
+  max-width: calc(19 * var(--cell));
+  margin: calc(var(--cell) / 2) 0 0;
+  font-size: 16px;
+  line-height: 28px;
+  color: var(--pencil);
+}
+
+.sheet {
+  margin-top: calc(2 * var(--cell));
+}
+
+/* Hatched and offset rather than blurred, which would be the only soft edge
+   in the drawing. Every slide in the group gets it, the cover included. */
+.shot {
+  position: relative;
+  display: block;
+}
+.shot::before {
+  content: '';
+  position: absolute;
+  transition:
+    top 180ms ease-out,
+    right 180ms ease-out,
+    bottom 180ms ease-out,
+    left 180ms ease-out;
+  inset: var(--half) calc(-1 * var(--half)) calc(-1 * var(--half)) var(--half);
+  border: 1px solid var(--draft);
+  background-image: repeating-linear-gradient(45deg, var(--draft) 0 1px, transparent 1px 6px);
+}
+.shot:hover::before,
+.shot:focus-visible::before {
+  inset: calc(var(--half) + 7px) calc(-1 * (var(--half) + 7px)) calc(-1 * (var(--half) + 7px))
+    calc(var(--half) + 7px);
+}
+.sheet > .shot:hover img,
+.sheet > .shot:focus-visible img {
+  transform: translate(calc(var(--cell) / -6), calc(var(--cell) / -6));
+}
+.shot img {
+  transition: transform 180ms ease-out;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #1e1e2e;
+}
+
+/* One column, read top to bottom. Split across two it asked the reader to
+   work out whether it ran across or down. */
+.spec {
+  margin: calc(2 * var(--cell)) 0 0;
+  font-size: 13px;
+  color: var(--pencil);
+}
+.spec div {
+  display: flex;
+  gap: 1ch;
+}
+.spec dt {
+  width: 8ch;
+  flex: none;
+}
+.spec dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+footer {
+  margin-top: calc(2 * var(--cell));
+  color: var(--pencil);
+  font-size: 13px;
+}
+footer a,
+.name a {
+  padding: 14px 0;
+}
+footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7ch;
+  text-underline-offset: 4px;
+}
+footer a:hover,
+footer a:focus-visible {
+  color: var(--ink);
+}
+footer svg {
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before {
+    transition-duration: 1ms !important;
+  }
+}
+
+@media (max-width: 40rem) {
+  h1 {
+    font-size: 32px;
+  }
+  .sheet {
+    grid-template-columns: 1fr;
+  }
+  .plate::before,
+  .rule,
+  .ticks {
+    display: none;
+  }
+}
