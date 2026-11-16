@@ -12,6 +12,7 @@
     "export": "pnpm fonts:check && node scripts/deck.mjs export",
     "site": "pnpm fonts:check && node site/build.mjs",
     "site:index": "node site/build.mjs --index-only",
+    "site:check": "node site/check.mjs",
     "site:serve": "pnpm dlx serve dist",
     "fonts": "node scripts/fetch-fonts.mjs",
     "fonts:check": "node scripts/fetch-fonts.mjs --check",

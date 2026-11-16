@@ -63,6 +63,15 @@ repos:
         language: system
         files: ^decks/.*\.md$
 
+      # The tracked-sources check can only fail where an untracked file is on
+      # disk, which is here and not in CI.
+      - id: site-check
+        name: site invariants
+        entry: node site/check.mjs
+        language: system
+        pass_filenames: false
+        files: ^(site/|scripts/|\.gitignore$)
+
       - id: check-commit-msg
         name: check commit message
         entry: uv run scripts/check_commit_msg.py
