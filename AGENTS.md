@@ -53,6 +53,58 @@ The margin is drawn in its own colour, and the overlay's colours are literals ra
 The golden ratio was tried for the title position and the column split, and dropped.
 [Euclid recommended simple rational ratios](https://www.sciencenews.org/?p=26532) for planning buildings and paintings, and there is little evidence that 1.618 carries aesthetic weight; the simple splits read better here too.
 
+## Themes
+
+`themes/original` is the only theme so far.
+
+### Layouts
+
+- `cover`: the deck title over `subtitle` from frontmatter, centred, with a rule along the bottom edge.
+- `section`: a chapter title with a bar down the left edge, ranged left; whatever follows the heading is muted.
+- `content`: the title band over the body box.
+- `two-cols`: a content page whose body splits into 13 cells, a two-cell gutter, and 13 cells.
+  The right column takes the `::right::` slot.
+
+### Components
+
+- `Banner`: a rotated band across the middle of the slide.
+- `PageNumber`: the slide's last cell, placed by `content` and `two-cols`.
+- `StackFrame`: `base`, `regions` in memory order (`size`, `label`, `mark`), `word` (4), `maxWords` (4), `steps`.
+  Regions are drawn highest address first and to scale, because how far a buffer reaches is what a frame is usually drawn to show.
+  One taller than `maxWords` is cut by a dashed rule that states its byte count instead.
+  `steps` fills the regions one click at a time, in push order.
+- `MemoryDump`: `base`, `bytes` as whitespace-separated hex, `mark` as a half-open offset range, `ascii`.
+  Sixteen bytes a row, with the gaps a hex viewer puts at the halfway mark and beside each rule.
+
+### Code
+
+A fence takes Slidev's own line ranges, and the theme styles what they produce.
+
+````markdown
+```cpp {all|3|4-7|9-10}
+````
+
+Marked lines keep their colour and the rest dim.
+The band behind a marked line appears only once some other line has dimmed, so an opening `all` does not tint the whole block.
+
+A second brace group binds props on `CodeBlockWrapper`, which Vue falls through to the rendered block, so a class can switch the whole presentation:
+
+````markdown
+```cpp {3|4|5} {class:'code-debug'}
+````
+
+`code-debug` stops the dimming and tints the stopped line the way a debugger does, because its steps say where execution is rather than what the talk is about.
+A line ending in `// [!code bp]` gets a breakpoint dot in the gutter; `setup/shiki.ts` maps that notation to `code-breakpoint` through `transformerNotationMap`.
+
+### Styles
+
+`styles/index.ts` imports these in order, after the generated `fonts.css`.
+
+- `base.css`: the palette, the grid and type tokens, and the `.slidev-layout` frame.
+- `code.css`: fenced blocks and the debugger view.
+- `diagram.css`: what `StackFrame` and `MemoryDump` share.
+- `page.css`: the title band, the body box, and the list markers inside it.
+
 ## Layout
 
 - `themes/<name>/`: one theme package.
