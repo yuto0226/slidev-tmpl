@@ -2,11 +2,14 @@
   "semi": false,
   "singleQuote": true,
   "printWidth": 100,
+  "endOfLine": "lf",
   "plugins": ["prettier-plugin-slidev"],
   "overrides": [
     {
       "files": ["decks/**/*.md"],
-      "options": { "parser": "slidev" }
+      "options": {
+        "parser": "slidev"
+      }
     }
   ]
 }
