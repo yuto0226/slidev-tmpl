@@ -36,7 +36,6 @@
   color: inherit;
 }
 
-/* Half a cell along the bottom edge, a rule rather than a band. */
 .cover-bar {
   position: absolute;
   left: 0;

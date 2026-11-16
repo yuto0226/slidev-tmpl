@@ -8,14 +8,13 @@
 </template>
 
 <style>
-/* A section ranges the block left, starting three cells in to clear the bar
-   along that edge and running to the right margin.
+/* A section ranges the block left, three cells in to clear the bar on that
+   edge and out to the right margin.
 
-   The heading is a child of the body box but is placed against the slide, so
-   the body box stays in flow. An absolute body box would become the frame the
-   heading is measured from. That is also why the two cannot share one
-   declaration, since one takes the offset as a left edge and the other as a
-   margin. */
+   The h1 is a child of the body box but is placed against the slide, so the
+   body box stays in flow (an absolute body box would become the h1's
+   containing block). The two cannot share a declaration, because one takes
+   the offset as left and the other as a margin. */
 .section {
   --section-x: calc(3 * var(--tmpl-cell));
   --section-width: calc(var(--tmpl-canvas-width) - var(--section-x) - var(--tmpl-margin));
@@ -32,8 +31,8 @@
   height: var(--tmpl-text-height);
 }
 
-/* The heading is a child of the body box, so the box mutes what is under the
-   heading rather than everything, which the heading would then have to undo. */
+/* Muting everything under the h1 here avoids muting the body box and having
+   the h1 undo it. */
 .section-body > :not(h1) {
   color: var(--tmpl-muted);
 }

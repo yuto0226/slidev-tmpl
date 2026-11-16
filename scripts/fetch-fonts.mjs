@@ -10,6 +10,8 @@ import { fileURLToPath } from 'node:url'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const cacheDir = path.join(root, '.cache', 'fonts')
 
+const fail = (who, message) => new Error(`${who}: ${message}`)
+
 const slugify = (text) =>
   text
     .toLowerCase()
@@ -20,7 +22,7 @@ async function archiveFor(font) {
   // Version and URL state the release twice; bumping one alone would keep
   // serving the old font without any error.
   if (!font.url.includes(`v${font.version}`)) {
-    throw new Error(`${font.family}: url does not carry version v${font.version}`)
+    throw fail(font.family, `url does not carry version v${font.version}`)
   }
 
   const cached = path.join(cacheDir, path.basename(new URL(font.url).pathname))
@@ -29,7 +31,7 @@ async function archiveFor(font) {
     console.log(`  downloading ${path.basename(cached)}`)
     const response = await fetch(font.url)
     if (!response.ok) {
-      throw new Error(`${font.family}: download failed with ${response.status} ${font.url}`)
+      throw fail(font.family, `download failed with ${response.status} ${font.url}`)
     }
     await mkdir(cacheDir, { recursive: true })
     await writeFile(cached, Buffer.from(await response.arrayBuffer()))
@@ -38,8 +40,9 @@ async function archiveFor(font) {
   const archive = await readFile(cached)
   const digest = createHash('sha256').update(archive).digest('hex')
   if (digest !== font.sha256) {
-    throw new Error(
-      `${font.family}: sha256 mismatch on ${cached}\n  expected ${font.sha256}\n  actual   ${digest}`,
+    throw fail(
+      font.family,
+      `sha256 mismatch on ${cached}\n  expected ${font.sha256}\n  actual   ${digest}`,
     )
   }
 
@@ -49,7 +52,7 @@ async function archiveFor(font) {
 // Archives nest their files under a directory that is renamed between releases.
 function read(zip, name, family) {
   const found = zip.getEntries().find((entry) => path.basename(entry.entryName) === name)
-  if (!found) throw new Error(`${family}: ${name} is not in the archive`)
+  if (!found) throw fail(family, `${name} is not in the archive`)
   return found.getData()
 }
 
@@ -61,9 +64,9 @@ async function splitFace(zip, font, face, outDir) {
     css: {
       fontFamily: font.family,
       fontWeight: String(face.weight),
-      fontStyle: face.style ?? 'normal',
-      // swap, so a chunk that arrives late shows fallback text meanwhile
-      // rather than nothing.
+      fontStyle: 'normal',
+      // swap shows fallback text while a chunk is in flight rather than
+      // nothing, at the cost of a visible change when it lands.
       fontDisplay: 'swap',
     },
     reporter: false,
@@ -72,9 +75,7 @@ async function splitFace(zip, font, face, outDir) {
 
   const sheets = (await readdir(outDir)).filter((name) => name.endsWith('.css'))
   if (sheets.length !== 1) {
-    throw new Error(
-      `${font.family} ${face.weight}: expected one stylesheet, found ${sheets.length}`,
-    )
+    throw fail(`${font.family} ${face.weight}`, `expected one stylesheet, found ${sheets.length}`)
   }
   // A local() source would let whatever copy of the family a viewer has
   // installed replace the pinned one, silently and unseen by the author.
@@ -83,7 +84,7 @@ async function splitFace(zip, font, face, outDir) {
   const css = await readFile(sheet, 'utf8')
   const stripped = css.replace(/local\([^)]*\),\s*/g, '')
   if (stripped === css) {
-    throw new Error(`${font.family} ${face.weight}: no local() source found to strip`)
+    throw fail(`${font.family} ${face.weight}`, 'no local() source found to strip')
   }
   await writeFile(sheet, stripped)
 
@@ -105,7 +106,7 @@ async function buildTheme(themeDir) {
     const base = slugify(font.family)
 
     for (const face of font.face) {
-      const slug = `${base}-${face.weight}${face.style === 'italic' ? '-italic' : ''}`
+      const slug = `${base}-${face.weight}`
       const sheet = await splitFace(zip, font, face, path.join(fontsDir, slug))
       imports.push(`@import './fonts/${slug}/${sheet}';`)
       console.log(`  ${face.weight} ${face.source}`)
@@ -125,10 +126,8 @@ async function buildTheme(themeDir) {
   )
 }
 
-// A missing stylesheet surfaces as an unresolved CSS import deep in a bundler
-// stack trace. A missing glyph surfaces nowhere at all, because it falls back
-// to whatever the viewer has installed and the author never sees it. Both
-// become this instead.
+// Without this check an unbuilt theme fails as an unresolved CSS import deep
+// in a bundler stack trace.
 function check(themeDir) {
   if (existsSync(path.join(themeDir, 'styles', 'fonts.css'))) return true
   console.error(`${path.basename(themeDir)}: fonts are not built. Run \`pnpm fonts\`.`)
@@ -144,9 +143,9 @@ if (process.argv.includes('--check')) {
   process.exit(themes.every((theme) => check(path.join(themesDir, theme))) ? 0 : 1)
 }
 
-// --check runs ahead of every dev and build, and cn-font-split binds a native
-// library and announces itself on stdout as it loads. Nothing it needs is
-// imported until the check has had its chance to exit.
+// --check runs before every dev and build, and cn-font-split loads a native
+// library that prints to stdout, so the dependencies are imported only after
+// the check has had its chance to exit.
 const { default: AdmZip } = await import('adm-zip')
 const { fontSplit } = await import('cn-font-split')
 const { parse: parseToml } = await import('smol-toml')

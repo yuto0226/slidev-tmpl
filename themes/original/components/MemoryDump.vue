@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { hex } from '../composables/hex'
 
 const props = defineProps({
   bytes: { type: String, required: true },
@@ -21,16 +22,12 @@ const edge = (i) => ({
 
 // A heading is a column number, not a byte, so it is set in the width of one
 // without the leading zero a byte would carry.
-const columns = Array.from({ length: WIDTH }, (_, i) =>
-  i.toString(16).toUpperCase().padStart(2, ' '),
-)
+const columns = Array.from({ length: WIDTH }, (_, i) => hex(i, 2, { fill: ' ' }))
 
-// A byte outside printable ASCII has no character of its own, and the dot is
-// what every hex viewer puts in its place.
 function cell(byte, offset) {
   const printable = byte >= 0x20 && byte <= 0x7e
   return {
-    hex: byte.toString(16).toUpperCase().padStart(2, '0'),
+    hex: hex(byte, 2),
     glyph: printable ? String.fromCharCode(byte) : '.',
     class: {
       'diagram-mark': offset >= props.mark[0] && offset < props.mark[1],
@@ -49,7 +46,7 @@ const rows = computed(() => {
   const out = []
   for (let offset = 0; offset < values.length; offset += WIDTH) {
     out.push({
-      addr: (start + offset).toString(16).toUpperCase().padStart(4, '0'),
+      addr: hex(start + offset, 4),
       cells: values.slice(offset, offset + WIDTH).map((byte, i) => cell(byte, offset + i)),
     })
   }
@@ -114,8 +111,6 @@ const rows = computed(() => {
   white-space: pre;
 }
 
-/* The address column is the one a reader counts from, so it is held apart
-   from the bytes rather than reading as another byte. */
 .memory-dump .memory-addr {
   padding-right: 1ch;
   border-right: var(--tmpl-rule-width) solid var(--tmpl-rule);
@@ -129,10 +124,9 @@ const rows = computed(() => {
   white-space: pre;
 }
 
-/* The gaps are transparent borders rather than padding, because a cell paints
-   its background out to the padding's edge. As padding the gap would be
-   swallowed by a marked byte's band, which would then start early and sit out
-   of line with its column. */
+/* A gap held as padding would be painted by a marked byte's band, which would
+   then start early and sit out of line with its column. A transparent border
+   with the background clipped to the padding box keeps the band to the byte. */
 .memory-dump .memory-first,
 .memory-dump .memory-mid,
 .memory-dump .memory-last {
@@ -151,17 +145,14 @@ const rows = computed(() => {
   border-right: 0.5ch solid transparent;
 }
 
-/* A byte with no character to show is still part of the dump, so it is set
-   back towards the background rather than taken out. The step is in the
-   colour and not in the cell's opacity, which would fade a mark's band with
-   it. */
+/* A byte with no character is dimmed through its colour and not its opacity,
+   which would fade a mark's band with it. */
 .memory-dump .memory-unprintable {
   color: color-mix(in srgb, var(--tmpl-muted) 60%, var(--tmpl-bg));
 }
 
-/* A marked byte reads against its band. This has to stay after the
-   unprintable rule, which it ties on specificity, so that a byte which is
-   both reads as marked. */
+/* Ties with .memory-unprintable on specificity and comes after it, so a marked
+   unprintable byte keeps the mark's text colour. */
 .memory-dump .diagram-mark {
   color: var(--tmpl-bg);
 }

@@ -28,14 +28,14 @@ Traditional Chinese prose is linted with `zhtw-mcp`, which must be installed sep
 ## References
 
 Presentation design has no specification the way the web does, and most of what search returns is template marketing.
-These are what the layouts are argued from.
+The layouts follow these sources.
 
 - [Material Design](https://m3.material.io/) and IBM Carbon, for grids and type scales that are written down.
   The cell and half cell follow their component-grid and baseline-grid split.
-- *Presentation Zen*, Garr Reynolds, on how much one slide should carry.
-- *slide:ology*, Nancy Duarte, the one that gets concrete about layout and charts.
-- *The Non-Designer's Design Book*, Robin Williams, for alignment, contrast, repetition and proximity.
-- [Optical versus geometric alignment](https://uiuxatlas.com/lessons/visual-design/optical-vs-geometric-alignment/), why a title block sits above centre.
-- [CSS Baseline: The Good, The Bad And The Ugly](https://www.smashingmagazine.com/2012/12/css-baseline-the-good-the-bad-and-the-ugly/), why a baseline grid in CSS aligns line boxes and not baselines.
+- _Presentation Zen_, Garr Reynolds, on how much one slide should carry.
+- _slide:ology_, Nancy Duarte, covers layout and charts concretely.
+- _The Non-Designer's Design Book_, Robin Williams, for alignment, contrast, repetition and proximity.
+- [Optical versus geometric alignment](https://uiuxatlas.com/lessons/visual-design/optical-vs-geometric-alignment/), explains why a title block sits above centre.
+- [CSS Baseline: The Good, The Bad And The Ugly](https://www.smashingmagazine.com/2012/12/css-baseline-the-good-the-bad-and-the-ugly/), explains why a baseline grid in CSS aligns line boxes and not baselines.
 
 See `AGENTS.md` for the grid, the font strategy, tooling, and commit conventions.

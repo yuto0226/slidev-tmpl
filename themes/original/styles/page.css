@@ -1,8 +1,7 @@
-/* The furniture a content page carries: the title band, the body box below
-   it, and the markers inside that box. A layout states where its boxes are;
-   what goes in them is the same on every page.
+/* The title, the body box and the list markers of a content page. A layout
+   states where its boxes are, and what goes in them is the same on every page.
 
-   The content area is the canvas less a two-cell margin: 28 cells across and
+   The content area is the canvas less a two-cell margin, 28 cells across and
    14 down. The title takes the first two rows, one row separates it from the
    body, and the body takes the remaining eleven. */
 
@@ -16,20 +15,17 @@
   display: flex;
   align-items: center;
   font-size: var(--tmpl-title-size);
-  font-weight: 700;
   line-height: var(--tmpl-line);
 }
 
-/* Every content page is a command typed at a prompt. */
 .tmpl-page h1::before {
   content: '$';
   color: var(--tmpl-prompt);
 }
 
-/* The body box carries the title's heading, so it is placed by its margins
-   rather than by offsets: an offset box would become the heading's frame and
-   take it along. A second box on the same page has no heading in it and is
-   placed directly. */
+/* The body box holds the title's heading, so it is placed by its margins,
+   because an offset would make it the heading's containing block and carry
+   the heading along. A second box has no heading and is placed by offsets. */
 .tmpl-body {
   margin: calc(5 * var(--tmpl-cell)) 0 0 var(--tmpl-margin);
   width: var(--tmpl-content-width);
@@ -65,10 +61,9 @@
   list-style: revert;
 }
 
-/* The outline page is a bulleted list whose text opens with a number in the
-   mark colour, so the number goes before the text and the marker stays the
-   same as any other list's. As the marker it would be wider than the indent
-   it hangs in and would overrun the box. */
+/* An ordered list keeps the disc marker and shows its number in the mark
+   colour before the text. As the marker, the number would be wider than the
+   indent and overrun the box. */
 .tmpl-body ol {
   list-style-type: disc;
 }

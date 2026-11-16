@@ -29,16 +29,15 @@ html:root {
   --tmpl-rule-width: 2px;
   --tmpl-breakpoint-row: rgb(255 80 80 / 40%);
   --tmpl-breakpoint-dot: #c00000;
-  /* The margin a debugger's breakpoint dot sits out in. */
   --tmpl-gutter: 18px;
 
   --tmpl-canvas-width: 960px;
   --tmpl-canvas-height: 540px;
 
-  /* A cell is one line of body text, 24pt set at 1.25, and it divides the
-     canvas into 32 columns by 18 rows. Every box in the theme is placed and
-     sized in whole cells, so a box and the text in it land on the same
-     lines. The half cell is what text inside a box moves by. */
+  /* A cell is one line of body text (24px at a line height of 1.25) and
+     divides the canvas into 32 columns by 18 rows. Every box is placed and
+     sized in whole cells, so a box and the text in it land on the same lines.
+     The half cell is what text inside a box moves by. */
   --tmpl-cell: 30px;
   --tmpl-half: calc(var(--tmpl-cell) / 2);
   --tmpl-margin: calc(2 * var(--tmpl-cell));
@@ -53,10 +52,9 @@ html:root {
   --tmpl-text-height: calc(4 * var(--tmpl-cell));
 
   /* Every size is a multiple of 12, so a line at 1.25 is a multiple of the
-     half cell. What lands on the grid is the line box: CSS has no baseline of
-     its own and splits the leading above and below the glyphs, so a baseline
-     sits a little inside its cell and two sizes on one row share a cell
-     rather than a baseline. The body is one cell per line, the title two. */
+     half cell. The grid aligns line boxes and not baselines, because CSS
+     splits the leading above and below the glyphs, so a baseline sits a
+     little inside its cell. The body is one cell per line and the title two. */
   --tmpl-line: 1.25;
   --tmpl-display-size: 60px;
   --tmpl-title-size: 48px;
@@ -71,7 +69,6 @@ html:root {
   --tmpl-indent: var(--tmpl-cell);
 
   --slidev-theme-primary: var(--tmpl-accent);
-  /* Code is set on the slide itself rather than in a panel. */
   --slidev-code-background: transparent;
   --slidev-code-foreground: var(--tmpl-fg);
   --slidev-code-padding: 0;
@@ -81,9 +78,7 @@ html:root {
   --slidev-code-line-height: 1.5;
 }
 
-/* Filling the canvas is the theme's job. Without a height the layout is only
-   as tall as its content. A layout places its own boxes, so there is nothing
-   to pad here. */
+/* A layout places its own boxes, so it fills the canvas and has no padding. */
 .slidev-layout {
   position: relative;
   /* A box placed by its top margin would otherwise push the whole slide

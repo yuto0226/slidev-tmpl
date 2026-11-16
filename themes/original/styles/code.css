@@ -1,25 +1,23 @@
-/* Code is set on the slide itself rather than in a panel, so the rules here
-   undo a panel's furniture and put back what a listing needs. The two
-   properties below name what a step does to a line; a view of the block can
-   answer them without restating the selectors that read them. */
+/* Code sits on the slide with no panel, so these rules undo Slidev's panel
+   styling and restore what a listing needs. --tmpl-code-dim and
+   --tmpl-code-band are what a step does to a line, so a variant overrides
+   them instead of rewriting the selectors. */
 .slidev-code {
   --tmpl-code-dim: 0.35;
   --tmpl-code-band: var(--tmpl-highlight);
 }
 
-/* No variable reaches these two.
-
-   The CSS reset claims every code, kbd, samp and pre. Slidev answers it on the
-   fenced block's pre, but Shiki nests a code element inside that the reset
-   matches in turn, and inline code is never answered at all.
-
-   CJK has no italic, so a comment set in italic is sheared rather than drawn,
-   and comments are where Chinese appears most in code. */
+/* No variable reaches these. The CSS reset claims every code, kbd, samp and
+   pre. Slidev answers it on the fenced block's pre, but Shiki nests a code
+   element inside that the reset matches in turn, and inline code is never
+   answered. */
 .slidev-code code,
 .slidev-layout :not(pre) > code {
   font-family: var(--slidev-code-font-family);
 }
 
+/* CJK has no italic, so a comment set in italic is sheared rather than drawn,
+   and comments are where Chinese most often appears in code. */
 .slidev-code,
 .slidev-code * {
   font-style: normal;
@@ -33,8 +31,8 @@
   display: grid;
 }
 
-/* A grid row with no content has no height, which is not what a blank line
-   in a listing looks like. */
+/* An empty grid row has no height, so a blank line needs content to keep its
+   row. */
 .slidev-code .line:empty::after {
   content: ' ';
 }
@@ -58,18 +56,17 @@
   --tmpl-code-band: var(--tmpl-breakpoint-row);
 }
 
-/* A line ending in `// [!code bp]` is one a debugger was told to stop at. Its
-   dot sits out in a gutter, where a debugger puts it, which is the margin
-   the block opens on the left. */
+/* The breakpoint dot hangs in a gutter on the left of the block, as in a
+   debugger. */
 .code-debug .slidev-code code {
   padding-left: var(--tmpl-gutter);
 }
 
-.code-debug .slidev-code .code-breakpoint {
+.code-debug .code-breakpoint {
   position: relative;
 }
 
-.code-debug .slidev-code .code-breakpoint::after {
+.code-debug .code-breakpoint::after {
   content: '';
   position: absolute;
   left: calc(-1 * var(--tmpl-gutter));

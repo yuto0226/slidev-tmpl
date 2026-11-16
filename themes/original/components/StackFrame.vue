@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { hex } from '../composables/hex'
 
 const props = defineProps({
   // The lowest address the frame covers, which is the bottom of the drawing.
@@ -19,15 +20,11 @@ const digits = computed(() => props.base.replace(/^0x/i, '').length)
 
 function address(offset) {
   const value = Number.parseInt(props.base, 16) + offset
-  return `0x${value.toString(16).padStart(digits.value, '0')}`
+  return `0x${hex(value, digits.value, { lower: true })}`
 }
 
-// A frame is drawn to scale, because how far a buffer reaches is the thing a
-// frame is usually drawn to show. A region too tall to fit is cut instead.
-//
-// The regions arrive in memory order and are drawn in reverse, highest
-// address first, which is both the order they appear down the page and the
-// order a frame is pushed in: return address, saved frame pointer, locals.
+// Regions are drawn to scale, because how far a buffer reaches is what a frame
+// diagram usually shows.
 const rows = computed(() => {
   let offset = 0
   const out = props.regions.map((region) => {
@@ -59,9 +56,8 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
       <div class="stack-addr diagram-addr">
         <span>{{ row.addr }}</span>
       </div>
-      <!-- The region is the layout and stands from the start; what a click
-           brings is inside it, so the fill is the click's target. false is
-           the value that turns a click off. -->
+      <!-- v-click is on the fill and not the region, so the region keeps its
+           height before the click. v-click="false" turns the click off. -->
       <div class="stack-region" :style="{ height: `${row.height}px` }">
         <div
           v-click="steps ? '+1' : false"
@@ -69,8 +65,8 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
           :class="{ 'diagram-mark': row.mark, 'stack-broken': row.broken }"
         >
           <div>{{ row.label }}</div>
-          <!-- A region drawn to scale states its size by its height. One cut
-               short has to say it. -->
+          <!-- A broken region cannot show its size by its height, so it prints
+               it. -->
           <div v-if="row.broken" class="stack-size">{{ row.size }} bytes</div>
         </div>
       </div>
@@ -103,10 +99,10 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
   translate: 0 50%;
 }
 
-/* A region is outlined rather than filled. Two regions share one edge: each
-   draws every side but the top, and the region at the top of the frame is
-   given that one back. Overlapping two boxes instead would let the later of
-   them paint over the edge of the one before it. */
+/* A region is outlined rather than filled. Regions share an edge by each
+   drawing every side but the top, and the topmost region gets its top back.
+   Overlapping boxes would let the later one paint over the edge of the
+   earlier one. */
 .stack-region {
   margin-left: 1ch;
   border: solid var(--tmpl-rule);
@@ -117,7 +113,6 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
   border-top-width: var(--tmpl-rule-width);
 }
 
-/* A region the stack has not reached is outlined a step darker. */
 .stack-region:has(.slidev-vclick-hidden) {
   border-color: var(--tmpl-rule-dim);
 }
@@ -136,7 +131,7 @@ const top = computed(() => address(props.regions.reduce((sum, region) => sum + r
 }
 
 /* A region drawn short of its size is cut across the middle, so its height
-   is read as elided rather than as the size it was given. */
+   reads as elided. */
 .stack-broken {
   background-image: linear-gradient(to right, var(--tmpl-rule) 50%, transparent 50%);
   background-position: 0 50%;

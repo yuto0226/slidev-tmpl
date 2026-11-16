@@ -3,8 +3,6 @@
 </template>
 
 <style>
-/* Two cells out from the content area's bottom right corner, which the two
-   cell margin makes the last cell of the slide. */
 .tmpl-page-number {
   position: absolute;
   right: 0;
@@ -15,7 +13,6 @@
   align-items: center;
   justify-content: center;
   font-size: var(--tmpl-page-size);
-  font-weight: 500;
   color: var(--tmpl-page);
 }
 </style>
