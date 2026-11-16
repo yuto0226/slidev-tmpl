@@ -1,0 +1,18 @@
+{
+  "name": "deck-demo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "slidev slides.md --open",
+    "build": "slidev build slides.md",
+    "export": "slidev export slides.md"
+  },
+  "dependencies": {
+    "slidev-theme-original": "workspace:*"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^53.1.0",
+    "playwright-chromium": "^1.65.1"
+  }
+}

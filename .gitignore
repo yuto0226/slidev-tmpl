@@ -1,0 +1,22 @@
+# node
+node_modules/
+dist/
+
+# fonts fetched and split by scripts/fetch-fonts.mjs
+.cache/
+themes/*/styles/fonts/
+themes/*/styles/fonts.css
+
+# slidev export output
+*.pdf
+*.pptx
+export/
+.slidev/
+
+# python (pre-commit/uv tooling)
+.venv/
+__pycache__/
+.ruff_cache/
+.rumdl_cache/
+
+.env

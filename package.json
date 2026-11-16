@@ -1,0 +1,35 @@
+{
+  "name": "slidev-tmpl",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal Slidev themes and decks",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "dev": "pnpm fonts:check && pnpm --filter deck-demo dev",
+    "build": "pnpm fonts:check && pnpm --filter deck-demo build",
+    "export": "pnpm fonts:check && pnpm --filter deck-demo export",
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "fonts:check": "node scripts/fetch-fonts.mjs --check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@slidev/types": "^53.1.0",
+    "adm-zip": "^0.6.1",
+    "cn-font-split": "^7.4.3",
+    "prettier": "^3.10.1",
+    "prettier-plugin-slidev": "^1.0.5",
+    "smol-toml": "^1.9.1",
+    "vue": "^3.5.45"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "cn-font-split",
+      "koffi",
+      "playwright-chromium",
+      "protobufjs"
+    ]
+  }
+}

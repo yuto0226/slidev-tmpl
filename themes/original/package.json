@@ -1,0 +1,37 @@
+{
+  "name": "slidev-theme-original",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Base Slidev theme",
+  "keywords": [
+    "slidev-theme",
+    "slidev"
+  ],
+  "license": "MIT",
+  "engines": {
+    "slidev": ">=53.0.0"
+  },
+  "slidev": {
+    "colorSchema": "dark",
+    "defaults": {
+      "canvasWidth": 960,
+      "lineNumbers": true,
+      "fonts": {
+        "sans": [
+          "GenSenRounded TW"
+        ],
+        "serif": [
+          "GenWanMin TW"
+        ],
+        "mono": [
+          "Maple Mono CN"
+        ],
+        "provider": "none"
+      }
+    }
+  },
+  "devDependencies": {
+    "@shikijs/transformers": "^4.6.0"
+  }
+}
