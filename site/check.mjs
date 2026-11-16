@@ -135,9 +135,15 @@ function deck(name, page) {
     .map((file) => path.join(assets, file))
     .filter((file) => statSync(file).isFile())
 
+  // A preload href carries the site's base path, which is whatever --base was
+  // given, so it is matched from the deck's own directory onward instead.
+  const here = path.relative(outDir, dir).split(path.sep).join('/')
   const missing = [...read(page).matchAll(/rel="preload" as="font"[^>]*href="([^"]+)"/g)]
     .map((match) => match[1])
-    .filter((url) => !existsSync(path.join(outDir, url.replace(/^\/+/, ''))))
+    .filter((url) => {
+      const at = url.indexOf(`/${here}/`)
+      return at === -1 || !existsSync(path.join(outDir, url.slice(at + 1)))
+    })
   check(`${name} preloads fonts that are there`, missing.length === 0, missing.join(', '))
 
   const covered = []
