@@ -1,0 +1,81 @@
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# deploy-pages mints the id-token for the deployment.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # A user site and a project site differ in base path and origin, and
+      # neither can be worked out from the repository name alone.
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Splitting CJK dominates this job. fonts.toml pins every release by
+      # sha256, so the same toml and script can only produce the same chunks.
+      - id: fonts
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache/fonts
+            themes/*/styles/fonts
+            themes/*/styles/fonts.css
+          key: fonts-${{ hashFiles('themes/*/fonts.toml', 'scripts/fetch-fonts.mjs') }}
+
+      - if: steps.fonts.outputs.cache-hit != 'true'
+        run: pnpm fonts
+
+      # The thumbnails are rendered in a real browser.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - run: pnpm --filter "./decks/*" exec playwright install --with-deps chromium
+
+      - run: >
+          node site/build.mjs
+          --base ${{ steps.pages.outputs.base_path }}
+          --origin ${{ steps.pages.outputs.origin }}
+          --repo ${{ github.server_url }}/${{ github.repository }}
+
+      # Seconds, and no browser, so it gates the artifact rather than
+      # following it.
+      - run: pnpm site:check
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
