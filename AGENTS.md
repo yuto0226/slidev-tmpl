@@ -82,6 +82,8 @@ A fence takes Slidev's own line ranges, and the theme styles what they produce.
 
 ````markdown
 ```cpp {all|3|4-7|9-10}
+
+```
 ````
 
 Marked lines keep their colour and the rest dim.
@@ -91,6 +93,8 @@ A second brace group binds props on `CodeBlockWrapper`, which Vue falls through 
 
 ````markdown
 ```cpp {3|4|5} {class:'code-debug'}
+
+```
 ````
 
 `code-debug` stops the dimming and tints the stopped line the way a debugger does, because its steps say where execution is rather than what the talk is about.
@@ -136,12 +140,12 @@ A font published on [Fontsource](https://fontsource.org) can be an ordinary depe
 Prefer that route when it exists.
 Nothing currently takes it: the CJK families below have no package, and Fontsource carries no CN edition of Maple Mono.
 
-| Role | Font | Source | License |
-| --- | --- | --- | --- |
-| CJK, rounded sans | 源泉圓體 (GenSenRounded) | [ButTaiwan/gensen-font](https://github.com/ButTaiwan/gensen-font) | OFL-1.1 |
-| CJK, serif | 源雲明體 (GenWanMin) | [ButTaiwan/genwan-font](https://github.com/ButTaiwan/genwan-font) | OFL-1.1 |
-| CJK, display | jf open 粉圓 | [justfont/open-huninn-font](https://github.com/justfont/open-huninn-font) | OFL-1.1 |
-| Mono | Maple Mono CN | [subframe7536/maple-font](https://github.com/subframe7536/maple-font) | OFL-1.1 |
+| Role              | Font                     | Source                                                                    | License |
+| ----------------- | ------------------------ | ------------------------------------------------------------------------- | ------- |
+| CJK, rounded sans | 源泉圓體 (GenSenRounded) | [ButTaiwan/gensen-font](https://github.com/ButTaiwan/gensen-font)         | OFL-1.1 |
+| CJK, serif        | 源雲明體 (GenWanMin)     | [ButTaiwan/genwan-font](https://github.com/ButTaiwan/genwan-font)         | OFL-1.1 |
+| CJK, display      | jf open 粉圓             | [justfont/open-huninn-font](https://github.com/justfont/open-huninn-font) | OFL-1.1 |
+| Mono              | Maple Mono CN            | [subframe7536/maple-font](https://github.com/subframe7536/maple-font)     | OFL-1.1 |
 
 This is what the repository draws from, not what every theme loads.
 A theme picks its CJK face by occasion.
@@ -170,15 +174,84 @@ The ButTaiwan families ship two Traditional Chinese glyph conventions, and the c
 ```bash
 pnpm install                      # once per clone
 pnpm dev                          # dev server for the demo deck
-pnpm build                        # static SPA into decks/demo/dist/
+pnpm build                        # static SPA into decks/original/dist/
 pnpm --filter deck-<name> build   # any other deck
 ```
 
 `pnpm export` produces a PDF, and `--format pptx-editable` an editable deck.
-It needs `playwright-chromium` in the deck package, which `decks/demo` already declares.
+It needs `playwright-chromium` in the deck package, which `decks/original` already declares.
 
 Exported `.pptx` is a one-way hand-off format.
 Edits made in PowerPoint do not come back, and SVG, canvas, iframes, and KaTeX stay as images.
+
+## Site
+
+`.github/workflows/pages.yml` publishes every deck to GitHub Pages on a push to `main`.
+
+```bash
+pnpm site          # assembles dist/ for local viewing, base /
+pnpm site:serve    # serves site/ on localhost
+pnpm site:index    # rewrites index.html alone, leaving the built decks in place
+```
+
+A full build is about 18 seconds a deck, nearly all of it Slidev building the deck and shooting its slides; rewriting the index alone is about 0.3 seconds whatever the deck count.
+Iterate on the page with `site:index` and reload.
+Pass `--base slidev-tmpl` to reproduce exactly what the workflow builds.
+
+`site/` is the index: a front-end project, kept as one rather than as tooling.
+`page.mjs` holds the markup, `index.css` and `rail.css` the stylesheets, `rail.js` the one script the page carries, `fonts.mjs` the faces it sets.
+A stylesheet kept as a JavaScript template string has no formatter, no highlighting and an escaping hazard every time it is edited; these are read from disk at build time and inlined.
+`site/build.mjs` builds it (flags, deck discovery, the per-deck Slidev calls, the font copy) and `site/check.mjs` checks it.
+The built site is `dist/`, which is why the project that builds it can have the name `site/`.
+
+`site/build.mjs` treats any directory under `decks/` holding a `slides.md` as a deck.
+Each one is built to `dist/t/<name>/` and listed on the generated `dist/index.html`.
+
+A Slidev SPA bakes its base path into asset URLs at build time, so `--base` has to be given; the workflow passes the repository name.
+Git Bash rewrites a leading-slash argument into a Windows path, so pass the name bare locally, and the script adds the slashes.
+
+Decks build with `--router-mode hash` because Pages serves static files with no SPA fallback, and a reload on `/t/<name>/5` would otherwise reach the server as a path that does not exist.
+
+A deck's `preview` headmatter names the slides that represent it on the index, first one large:
+
+```yaml
+preview: [1, 3, 7, 9]
+```
+
+Thumbnails are rendered through `playwright-chromium`, which the deck package already declares.
+
+The index is the themes' guide overlay left switched on: it runs on the same 30px cell and draws it.
+A theme's name and description come before its slides and the spec list after, so a heading always precedes what it names.
+With one theme the order is a preference; with six it is the difference between a labelled entry and four unidentified pictures.
+The four slides are peers at one size in a 2x2 grid, each with the same offset hatched shadow.
+Every theme's cover stands in a construction box: a dashed frame one cell clear of the slide, with scales along its top and left edges dividing it into that deck's own columns and rows rather than into page cells, and the canvas measured along the other two.
+The numbers are that theme's, so the frame measures something different each time rather than repeating one fact.
+Hovering the cover turns one value: the slide is drawn larger inside its frame, the scales open out by the same factor, and the measures read what is on screen rather than what the file is.
+It states the format once for the page; repeated under every theme it would annotate nothing.
+Below 40rem the grid becomes one column and the construction box is hidden.
+
+With more than one theme the page grows a rule of its own: a tick a theme, standing in the margin above 78rem and lying under the header below it, where there is no margin to stand in.
+Every tick ends on one line, and the tick of the theme you are reading is longer and darker.
+That is the only thing on the page that needs a script, a short observer that sets `aria-current`.
+One theme has nothing to navigate, so none of it, including its stylesheet and its script, reaches the page.
+
+```bash
+pnpm site:check    # also runs in the workflow, before the artifact is kept
+```
+
+`site/check.mjs` checks mechanical facts and nothing else: that every custom property the stylesheets read is declared somewhere, that every file `page.mjs` inlines is tracked by git, that every local URL the page names is on disk, and that no `undefined` reached the page.
+It does not open a browser and does not check that the page looks right or behaves.
+That is read on the page.
+The line is worth holding: both defects it was written for were static facts that no amount of looking at the page would have shown.
+
+Every number on the page is read from the theme it describes: the cell and type sizes out of `base.css`, the faces and canvas out of `package.json`, the layouts out of the directory, the slide count through `@slidev/parser`.
+Nothing there is typed by hand, so the index cannot drift from the theme.
+
+The page sets GenSenRounded TW and Maple Mono CN, copied into `dist/fonts/`.
+`site/fonts.mjs` is where that is decided, and one entry names all three things it takes: the theme whose split chunks are copied, the chunk directory, and the family the stylesheets ask for.
+The build copies by slug from the named theme and declares `--sans` and `--mono` on the page, so the stylesheets never spell a face and a face that was not shipped cannot be asked for.
+A deck ships every chunk of a split CJK face because its text is whatever the author writes next; the index's text is fixed once it is built, so `copyFonts` keeps only the chunks and `@font-face` rules whose `unicode-range` covers a character the page actually sets.
+The page is therefore rendered before the fonts are copied.
 
 ## Repository tooling
 
@@ -197,8 +270,8 @@ Chinese prose in the deck and in `docs/` is checked with `zhtw-mcp`, installed s
 It catches cross-strait vocabulary (內存 → 記憶體, 緩存 → 快取), AI filler, and translationese.
 
 ```bash
-zhtw-mcp lint --content-type markdown decks/demo/slides.md
-zhtw-mcp lint --content-type markdown --fix decks/demo/slides.md
+zhtw-mcp lint --content-type markdown decks/original/slides.md
+zhtw-mcp lint --content-type markdown --fix decks/original/slides.md
 ```
 
 `--content-type markdown` skips fenced code blocks, so identifiers and output samples are left alone.
