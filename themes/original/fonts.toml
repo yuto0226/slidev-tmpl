@@ -1,0 +1,54 @@
+# Name only the weights used. Coverage is free once chunked, a weight is not.
+#
+# TW (月版) rather than TC (丹版), so the glyphs carry the contemporary stroke
+# forms rather than the letterpress ones.
+
+[[font]]
+family = "GenSenRounded TW"
+version = "2.100"
+url = "https://github.com/ButTaiwan/gensen-font/releases/download/v2.100/GenSenRounded2TW-otf.zip"
+sha256 = "c5a18c0661c0b26effe5503431f2fee176137f6451be3ae37b9787c6179cf325"
+license = "SIL_Open_Font_License_1.1.txt"
+
+  # Medium rather than Regular, because a projector washes out thin strokes.
+  [[font.face]]
+  weight = 500
+  source = "GenSenRounded2TW-M.otf"
+
+  [[font.face]]
+  weight = 700
+  source = "GenSenRounded2TW-B.otf"
+
+[[font]]
+family = "GenWanMin TW"
+version = "2.100"
+url = "https://github.com/ButTaiwan/genwan-font/releases/download/v2.100/GenWanMin2TW-otf.zip"
+sha256 = "ddc324b2f3f804e36b6084b2e773900a8f74455c1fbfa1f38d082344f4ab3264"
+license = "SIL_Open_Font_License_1.1.txt"
+
+  [[font.face]]
+  weight = 500
+  source = "GenWanMin2TW-M.otf"
+
+  # The heaviest weight this family ships. Declared as 600, not 700, so a
+  # request for bold synthesises instead of silently landing here.
+  [[font.face]]
+  weight = 600
+  source = "GenWanMin2TW-SB.otf"
+
+# The CN edition sets every CJK glyph at exactly twice the Latin advance, so
+# mixed-script code holds its columns. It carries the Latin too.
+[[font]]
+family = "Maple Mono CN"
+version = "7.9"
+url = "https://github.com/subframe7536/maple-font/releases/download/v7.9/MapleMono-CN.zip"
+sha256 = "cb1e79b2c23dff772ae351784ef2b84454a61b3920e9b20bd5db4bf207e4472d"
+license = "LICENSE.txt"
+
+  [[font.face]]
+  weight = 400
+  source = "MapleMono-CN-Regular.ttf"
+
+  [[font.face]]
+  weight = 700
+  source = "MapleMono-CN-Bold.ttf"
