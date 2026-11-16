@@ -30,6 +30,15 @@
    rather than by offsets: an offset box would become the heading's frame and
    take it along. A second box on the same page has no heading in it and is
    placed directly. */
+.tmpl-body {
+  margin: calc(5 * var(--tmpl-cell)) 0 0 var(--tmpl-margin);
+  width: var(--tmpl-content-width);
+  height: calc(11 * var(--tmpl-cell));
+  display: flex;
+  flex-direction: column;
+  gap: var(--tmpl-para-gap);
+}
+
 /* The title of a cover and of a section. It is anchored to its bottom edge,
    so it grows upward and the gap to the text below holds however many lines
    it takes. Each layout adds only its own left edge and width. */
@@ -45,12 +54,6 @@
   font-size: var(--tmpl-display-size);
   font-weight: 700;
   line-height: var(--tmpl-line);
-}
-
-.tmpl-body {
-  margin: calc(5 * var(--tmpl-cell)) 0 0 var(--tmpl-margin);
-  width: var(--tmpl-content-width);
-  height: calc(11 * var(--tmpl-cell));
 }
 
 /* The indent is the list's, so the marker hangs outside it and wrapped text
@@ -75,25 +78,15 @@
   color: var(--tmpl-mark);
 }
 
-/* Every paragraph but the first in a box opens with a gap, and a nested one
-   opens with half of it. */
-.tmpl-body p,
-.tmpl-body > :where(ul, ol) > li {
-  margin-top: var(--tmpl-para-gap);
+/* A list spaces its items the way the box spaces its paragraphs, and a
+   nested list by half, which is also what separates it from the item it
+   hangs under. */
+.tmpl-body :where(ul, ol) {
+  display: grid;
+  gap: var(--tmpl-para-gap);
 }
 
-.tmpl-body :where(ul, ol) :where(ul, ol) > li {
+.tmpl-body :where(ul, ol) :where(ul, ol) {
+  gap: calc(var(--tmpl-para-gap) / 2);
   margin-top: calc(var(--tmpl-para-gap) / 2);
-}
-
-/* The heading sits on the slide rather than in the box, so the box's first
-   paragraph is the one that follows it. */
-.tmpl-body > :first-child,
-.tmpl-body > h1:first-child + * {
-  margin-top: 0;
-}
-
-.tmpl-body > :where(ul, ol):first-child > li:first-child,
-.tmpl-body > h1:first-child + :where(ul, ol) > li:first-child {
-  margin-top: 0;
 }
