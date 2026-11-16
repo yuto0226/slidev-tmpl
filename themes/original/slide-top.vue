@@ -118,7 +118,7 @@ watch(guideLevel, () => requestAnimationFrame(measure))
 
 .tmpl-guides-col {
   top: 0;
-  width: 2px;
+  width: 1px;
   height: 540px;
   --tmpl-guides-along: to bottom;
 }
@@ -126,7 +126,7 @@ watch(guideLevel, () => requestAnimationFrame(measure))
 .tmpl-guides-row {
   left: 0;
   width: 960px;
-  height: 2px;
+  height: 1px;
   --tmpl-guides-along: to right;
 }
 </style>
