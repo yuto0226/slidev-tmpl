@@ -131,6 +131,10 @@ function wanted(rule, codepoints) {
 // stylesheet and emits a chunk for each. A deck's text is fixed once it is
 // built, so the chunks it can ever ask for are known, and the rest are weight
 // the reader pays for and never uses.
+//
+// What is kept is preloaded, because a unicode-range face is fetched only
+// when a glyph in its range is first painted, which is the moment the slide
+// carrying it appears, in front of an audience.
 async function narrowDeckFonts(out, base) {
   const assets = path.join(out, 'assets')
   if (!existsSync(assets)) return
@@ -183,6 +187,17 @@ async function narrowDeckFonts(out, base) {
     await rm(file)
     removed += 1
   }
+
+  const links = [...keep]
+    .sort()
+    .map(
+      (name) =>
+        `<link rel="preload" as="font" type="font/woff2" crossorigin href="${base}assets/${name}">`,
+    )
+    .join('\n')
+  const page = path.join(out, 'index.html')
+  const html = await readFile(page, 'utf8')
+  await writeFile(page, html.replace('</head>', `${links}\n</head>`), 'utf8')
 
   console.log(`  fonts: kept ${keep.size} chunks, dropped ${dropped} faces and ${removed} files`)
 }
