@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { guideLevel } from './composables/guides'
 
 const authoring = import.meta.env.DEV
@@ -40,7 +40,16 @@ function measure() {
   rows.value = [...y].filter((at) => !marginRows.value.includes(at)).sort((a, b) => a - b)
 }
 
-onMounted(measure)
+/* Slidev mounts every slide at once and hides all but the current one with
+   v-show, so this runs first against a display: none slide that measures
+   zero. Observing the size covers that, because becoming visible is a resize;
+   toggling the guides is not, so it still asks on its own. */
+onMounted(() => {
+  const observer = new ResizeObserver(measure)
+  observer.observe(root.value)
+  onUnmounted(() => observer.disconnect())
+})
+
 watch(guideLevel, () => requestAnimationFrame(measure))
 </script>
 
