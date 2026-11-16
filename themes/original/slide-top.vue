@@ -9,6 +9,7 @@ const authoring = import.meta.env.DEV
        slide's 960 by 540 coordinate space and scales with it: a line drawn at
        30px lands on the same cell the layout was placed in. -->
   <div v-if="authoring && guideLevel" class="tmpl-guides">
+    <div v-if="guideLevel === 2" class="tmpl-guides-halves" />
     <div class="tmpl-guides-cells" />
     <div class="tmpl-guides-content" />
     <div class="tmpl-guides-rule" style="top: 120px" />
@@ -35,6 +36,24 @@ const authoring = import.meta.env.DEV
      so both sections of both axes get a line. */
   --tmpl-phi-x: calc(var(--tmpl-content-width) / 1.618);
   --tmpl-phi-y: calc(420px / 1.618);
+}
+
+/* Half cells are where a line of text actually lands, so they are drawn
+   under the cells rather than instead of them. */
+.tmpl-guides-halves {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      rgb(255 255 255 / 5%) 0 1px,
+      transparent 1px var(--tmpl-half)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 5%) 0 1px,
+      transparent 1px var(--tmpl-half)
+    );
 }
 
 /* One gradient stop per axis draws the whole 32 by 18 grid without a node

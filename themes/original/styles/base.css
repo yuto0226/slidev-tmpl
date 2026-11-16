@@ -36,8 +36,10 @@ html:root {
   --tmpl-content-width: calc(960px - 2 * var(--tmpl-margin));
 
   /* Every size is a multiple of 12, so a line at 1.25 is a multiple of the
-     half cell and the text sits on the grid rather than near it. The body is
-     one cell per line, the title two. */
+     half cell. What lands on the grid is the line box: CSS has no baseline of
+     its own and splits the leading above and below the glyphs, so a baseline
+     sits a little inside its cell and two sizes on one row share a cell
+     rather than a baseline. The body is one cell per line, the title two. */
   --tmpl-line: 1.25;
   --tmpl-display-size: 60px;
   --tmpl-title-size: 48px;
