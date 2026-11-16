@@ -220,17 +220,19 @@ preview: [1, 3, 7, 9]
 
 Thumbnails are rendered through `playwright-chromium`, which the deck package already declares.
 
-The index is the themes' guide overlay left switched on: it runs on the same 30px cell and draws it.
+The index is the themes' guide overlay left switched on.
+It runs on the same 30px cell and draws it.
 A theme's name and description come before its slides and the spec list after, so a heading always precedes what it names.
 With one theme the order is a preference; with six it is the difference between a labelled entry and four unidentified pictures.
 The four slides are peers at one size in a 2x2 grid, each with the same offset hatched shadow.
 Every theme's cover stands in a construction box: a dashed frame one cell clear of the slide, with scales along its top and left edges dividing it into that deck's own columns and rows rather than into page cells, and the canvas measured along the other two.
 The numbers are that theme's, so the frame measures something different each time rather than repeating one fact.
-Hovering the cover turns one value: the slide is drawn larger inside its frame, the scales open out by the same factor, and the measures read what is on screen rather than what the file is.
+Hovering the cover turns one value.
+The slide is drawn larger inside its frame, the scales open out by the same factor, and the measures read what is on screen rather than what the file is.
 It states the format once for the page; repeated under every theme it would annotate nothing.
 Below 40rem the grid becomes one column and the construction box is hidden.
 
-With more than one theme the page grows a rule of its own: a tick a theme, standing in the margin above 78rem and lying under the header below it, where there is no margin to stand in.
+With more than one theme the page grows a rule of its own, a tick a theme, standing in the margin above 78rem and lying under the header below it, where there is no margin to stand in.
 Every tick ends on one line, and the tick of the theme you are reading is longer and darker.
 That is the only thing on the page that needs a script, a short observer that sets `aria-current`.
 One theme has nothing to navigate, so none of it, including its stylesheet and its script, reaches the page.
@@ -242,7 +244,8 @@ pnpm site:check    # also runs in the workflow, before the artifact is kept
 `site/check.mjs` checks mechanical facts and nothing else: that every custom property the stylesheets read is declared somewhere, that every file `page.mjs` inlines is tracked by git, that every local URL the page names is on disk, and that no `undefined` reached the page.
 It does not open a browser and does not check that the page looks right or behaves.
 That is read on the page.
-The line is worth holding: both defects it was written for were static facts that no amount of looking at the page would have shown.
+The line is worth holding.
+Both defects it was written for were static facts that no amount of looking at the page would have shown.
 
 Every number on the page is read from the theme it describes: the cell and type sizes out of `base.css`, the faces and canvas out of `package.json`, the layouts out of the directory, the slide count through `@slidev/parser`.
 Nothing there is typed by hand, so the index cannot drift from the theme.
@@ -314,7 +317,8 @@ The header format is checked mechanically by the `commit-msg` hook (`scripts/che
 
 These rules hold for every file in the repository: code, comments, configuration, commit messages, and documentation alike.
 A comment in a TOML manifest is held to the same standard as one in a Vue component.
-Remove all mannered prose: no meaningless, decorative adverbs or complements.
+Remove all mannered prose.
+No meaningless, decorative adverbs or complements.
 
 - Be concise and direct.
   Say it once; omit what the context already makes clear.
@@ -329,9 +333,12 @@ Remove all mannered prose: no meaningless, decorative adverbs or complements.
 
 - `,` comma (Oxford comma before the last item in a list), `.` period
 - `;` semicolon, joins two independent sentences
-- `:` colon, introduces a list or explanation
+- `:` colon, introduces a list.
+  A statement and its gloss is two half-statements, so write one sentence
 - Curly quotes `" " ' '`, not straight quotes
-- En dash `–` for ranges (`2020–2023`); em dash `—` for an aside (no surrounding spaces), used sparingly, not as a default connector
+- En dash `–` for ranges (`2020–2023`).
+  No em dash.
+  An aside is a sentence of its own, a comma, or parentheses
 - `…` ellipsis as a single glyph, not three periods
 
 ### Chinese (繁體中文)
@@ -339,9 +346,9 @@ Remove all mannered prose: no meaningless, decorative adverbs or complements.
 - `，` comma, for a pause within a sentence; `、` enumeration comma, between parallel items (not `，`)
 - `。` full stop, ends a statement
 - `；` semicolon, joins two closely related independent clauses
-- `：` colon, introduces a list, explanation, or quote
+- `：` colon, introduces a list or quote，不用來接解釋
 - `「」` quotes (primary), `『』` for a quote nested inside another quote
-- `——` em dash, for an aside or elaboration; use sparingly
+- 不使用 `——`，補充就另起一句或用逗號
 - `……` ellipsis, the two-character glyph (six dots), not three periods
 - `《》` title marks, for book or work titles
 - 禁止使用無意義的、裝飾性的狀語或補語
