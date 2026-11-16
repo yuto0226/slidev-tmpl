@@ -1,27 +1,56 @@
 <script setup>
+import { onMounted, ref, watch } from 'vue'
 import { guideLevel } from './composables/guides'
 
 const authoring = import.meta.env.DEV
+
+const root = ref(null)
+const cols = ref([])
+const rows = ref([])
+
+/* Every edge of every box the layout placed, read back from the slide rather
+   than listed here, so a layout gets its lines by existing. The margin is
+   added because it is a box no element stands for. */
+function measure() {
+  const el = root.value
+  if (!el) return
+  const slide = el.getBoundingClientRect()
+  const scale = slide.width / 960
+  if (!scale) return
+
+  const x = new Set([60, 900])
+  const y = new Set([60, 480])
+  for (const box of el.parentElement.querySelectorAll('h1, .tmpl-body, .tmpl-box')) {
+    const r = box.getBoundingClientRect()
+    if (!r.width || !r.height) continue
+    x.add(Math.round((r.left - slide.left) / scale))
+    x.add(Math.round((r.right - slide.left) / scale))
+    y.add(Math.round((r.top - slide.top) / scale))
+    y.add(Math.round((r.bottom - slide.top) / scale))
+  }
+  cols.value = [...x].sort((a, b) => a - b)
+  rows.value = [...y].sort((a, b) => a - b)
+}
+
+onMounted(measure)
+watch(guideLevel, () => requestAnimationFrame(measure))
 </script>
 
 <template>
   <!-- Slidev renders this layer inside every slide, so the overlay shares the
        slide's 960 by 540 coordinate space and scales with it: a line drawn at
        30px lands on the same cell the layout was placed in. -->
-  <div v-if="authoring && guideLevel" class="tmpl-guides">
-    <div v-if="guideLevel === 2" class="tmpl-guides-halves" />
-    <div class="tmpl-guides-cells" />
-    <div class="tmpl-guides-content" />
-    <div class="tmpl-guides-rule" style="top: 120px" />
-    <div class="tmpl-guides-rule" style="top: 150px" />
-    <template v-if="guideLevel === 2">
-      <div class="tmpl-guides-phi tmpl-guides-phi-x" style="left: calc(60px + var(--tmpl-phi-x))" />
+  <div v-if="authoring" ref="root" class="tmpl-guides" :class="{ 'tmpl-guides-on': guideLevel }">
+    <template v-if="guideLevel">
+      <div v-if="guideLevel === 2" class="tmpl-guides-halves" />
+      <div class="tmpl-guides-cells" />
       <div
-        class="tmpl-guides-phi tmpl-guides-phi-x"
-        style="left: calc(900px - var(--tmpl-phi-x))"
+        v-for="at in cols"
+        :key="`c${at}`"
+        class="tmpl-guides-col"
+        :style="{ left: `${at}px` }"
       />
-      <div class="tmpl-guides-phi tmpl-guides-phi-y" style="top: calc(60px + var(--tmpl-phi-y))" />
-      <div class="tmpl-guides-phi tmpl-guides-phi-y" style="top: calc(480px - var(--tmpl-phi-y))" />
+      <div v-for="at in rows" :key="`r${at}`" class="tmpl-guides-row" :style="{ top: `${at}px` }" />
     </template>
   </div>
 </template>
@@ -31,11 +60,12 @@ const authoring = import.meta.env.DEV
   position: absolute;
   inset: 0;
   pointer-events: none;
-  --tmpl-guides-ink: #89b3fa;
-  /* The content box less its golden section, measured from each edge in turn
-     so both sections of both axes get a line. */
-  --tmpl-phi-x: calc(var(--tmpl-content-width) / 1.618);
-  --tmpl-phi-y: calc(420px / 1.618);
+}
+
+/* The overlay has to be measurable before it has anything to draw, so it is
+   always in the slide and only its contents come and go. */
+.tmpl-guides:not(.tmpl-guides-on) {
+  visibility: hidden;
 }
 
 /* Half cells are where a line of text actually lands, so they are drawn
@@ -74,48 +104,29 @@ const authoring = import.meta.env.DEV
     );
 }
 
-.tmpl-guides-content {
+/* A box edge cuts the whole slide, so anything else on the slide can be lined
+   up against it and not only against the box it came from. */
+.tmpl-guides-col,
+.tmpl-guides-row {
   position: absolute;
-  inset: var(--tmpl-margin);
-  border: 1px solid var(--tmpl-guides-ink);
-}
-
-/* Where the title band ends and the body box begins. */
-.tmpl-guides-rule {
-  position: absolute;
-  left: var(--tmpl-margin);
-  width: var(--tmpl-content-width);
-  height: 1px;
-  background: var(--tmpl-guides-ink);
-}
-
-.tmpl-guides-phi {
-  position: absolute;
-  --tmpl-guides-dash: repeating-linear-gradient(
-    var(--tmpl-guides-angle),
-    var(--tmpl-mark) 0 6px,
-    transparent 6px 12px
+  background-image: repeating-linear-gradient(
+    var(--tmpl-guides-along),
+    #89b3fa 0 8px,
+    transparent 8px 16px
   );
-  background-image: var(--tmpl-guides-dash);
 }
 
-.tmpl-guides-phi-x {
-  top: var(--tmpl-margin);
-  width: 1px;
-  height: 420px;
-  --tmpl-guides-angle: to bottom;
+.tmpl-guides-col {
+  top: 0;
+  width: 2px;
+  height: 540px;
+  --tmpl-guides-along: to bottom;
 }
 
-.tmpl-guides-phi-y {
-  left: var(--tmpl-margin);
-  width: var(--tmpl-content-width);
-  height: 1px;
-  --tmpl-guides-angle: to right;
-}
-
-/* Every box a layout places, outlined where it actually landed. */
-.tmpl-guides-boxes
-  :is(.tmpl-body, .slidev-layout h1, .cover-title, .cover-subtitle, .tmpl-page-number) {
-  outline: 1px dashed rgb(255 255 255 / 45%);
+.tmpl-guides-row {
+  left: 0;
+  width: 960px;
+  height: 2px;
+  --tmpl-guides-along: to right;
 }
 </style>

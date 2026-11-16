@@ -1,9 +1,9 @@
 <template>
   <div class="slidev-layout cover">
-    <div class="cover-title">
+    <div class="cover-title tmpl-box">
       <slot />
     </div>
-    <div class="cover-subtitle">
+    <div class="cover-subtitle tmpl-box">
       {{ $frontmatter.subtitle }}
     </div>
     <div class="cover-bar" />

@@ -1,5 +1,5 @@
 <template>
-  <div class="tmpl-page-number">{{ $slidev.nav.currentPage }}</div>
+  <div class="tmpl-page-number tmpl-box">{{ $slidev.nav.currentPage }}</div>
 </template>
 
 <style>
