@@ -7,10 +7,14 @@ const authoring = import.meta.env.DEV
 const root = ref(null)
 const cols = ref([])
 const rows = ref([])
+const marginCols = ref([])
+const marginRows = ref([])
 
 /* Every edge of every box the layout placed, read back from the slide rather
    than listed here, so a layout gets its lines by existing. The margin is
-   added because it is a box no element stands for. */
+   measured from its token rather than from an element, because no element
+   stands for it, and a box edge that lands on it is dropped so the margin
+   keeps its own colour there. */
 function measure() {
   const el = root.value
   if (!el) return
@@ -18,8 +22,12 @@ function measure() {
   const scale = slide.width / 960
   if (!scale) return
 
-  const x = new Set([60, 900])
-  const y = new Set([60, 480])
+  const margin = Number.parseFloat(getComputedStyle(el).getPropertyValue('--tmpl-margin'))
+  marginCols.value = [margin, 960 - margin]
+  marginRows.value = [margin, 540 - margin]
+
+  const x = new Set()
+  const y = new Set()
   for (const box of el.parentElement.querySelectorAll('h1, .tmpl-body, .tmpl-box')) {
     const r = box.getBoundingClientRect()
     if (!r.width || !r.height) continue
@@ -28,8 +36,8 @@ function measure() {
     y.add(Math.round((r.top - slide.top) / scale))
     y.add(Math.round((r.bottom - slide.top) / scale))
   }
-  cols.value = [...x].sort((a, b) => a - b)
-  rows.value = [...y].sort((a, b) => a - b)
+  cols.value = [...x].filter((at) => !marginCols.value.includes(at)).sort((a, b) => a - b)
+  rows.value = [...y].filter((at) => !marginRows.value.includes(at)).sort((a, b) => a - b)
 }
 
 onMounted(measure)
@@ -51,6 +59,18 @@ watch(guideLevel, () => requestAnimationFrame(measure))
         :style="{ left: `${at}px` }"
       />
       <div v-for="at in rows" :key="`r${at}`" class="tmpl-guides-row" :style="{ top: `${at}px` }" />
+      <div
+        v-for="at in marginCols"
+        :key="`mc${at}`"
+        class="tmpl-guides-col tmpl-guides-margin"
+        :style="{ left: `${at}px` }"
+      />
+      <div
+        v-for="at in marginRows"
+        :key="`mr${at}`"
+        class="tmpl-guides-row tmpl-guides-margin"
+        :style="{ top: `${at}px` }"
+      />
     </template>
   </div>
 </template>
@@ -105,15 +125,24 @@ watch(guideLevel, () => requestAnimationFrame(measure))
 }
 
 /* A box edge cuts the whole slide, so anything else on the slide can be lined
-   up against it and not only against the box it came from. */
+   up against it and not only against the box it came from. The margin is the
+   frame the boxes sit in rather than one of them, so it is drawn apart.
+
+   These colours are literals, not tokens: an authoring aid that took the
+   theme's palette would disappear against a slide using the same colours. */
 .tmpl-guides-col,
 .tmpl-guides-row {
   position: absolute;
   background-image: repeating-linear-gradient(
     var(--tmpl-guides-along),
-    #89b3fa 0 8px,
+    var(--tmpl-guides-ink) 0 8px,
     transparent 8px 16px
   );
+  --tmpl-guides-ink: #89b3fa;
+}
+
+.tmpl-guides-margin {
+  --tmpl-guides-ink: #f9e2af;
 }
 
 .tmpl-guides-col {
