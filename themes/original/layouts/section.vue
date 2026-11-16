@@ -8,40 +8,28 @@
 </template>
 
 <style>
-/* The same ten-cell block as a cover, ranged left instead of centred: the
-   title takes six cells and the text under it four, three cells down from
-   the top. The text starts three cells in, which clears the bar along the
-   left edge.
+/* A section ranges the block left, starting three cells in to clear the bar
+   along that edge and running to the right margin.
 
    The heading is a child of the body box but is placed against the slide, so
-   the body box stays in flow: an absolute body box would become the frame the
-   heading is measured from. */
-/* The heading is placed and the body box flows, so they cannot share a
-   declaration: one takes the offset as left, the other as a margin. */
+   the body box stays in flow. An absolute body box would become the frame the
+   heading is measured from. That is also why the two cannot share one
+   declaration, since one takes the offset as a left edge and the other as a
+   margin. */
 .section {
   --section-x: calc(3 * var(--tmpl-cell));
-  --section-width: calc(960px - 3 * var(--tmpl-cell) - var(--tmpl-margin));
+  --section-width: calc(var(--tmpl-canvas-width) - var(--section-x) - var(--tmpl-margin));
 }
 
 .section h1 {
-  position: absolute;
   left: var(--section-x);
   width: var(--section-width);
-  top: calc(3 * var(--tmpl-cell));
-  height: calc(6 * var(--tmpl-cell));
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  font-size: var(--tmpl-display-size);
-  font-weight: 700;
-  line-height: var(--tmpl-line);
 }
 
 .section-body {
-  margin: calc(9 * var(--tmpl-cell)) 0 0 var(--section-x);
+  margin: var(--tmpl-text-top) 0 0 var(--section-x);
   width: var(--section-width);
-  height: calc(4 * var(--tmpl-cell));
+  height: var(--tmpl-text-height);
 }
 
 /* The heading is a child of the body box, so the box mutes what is under the
@@ -55,7 +43,7 @@
   left: 0;
   top: 0;
   width: var(--tmpl-half);
-  height: 540px;
+  height: var(--tmpl-canvas-height);
   background: var(--tmpl-mark);
 }
 </style>

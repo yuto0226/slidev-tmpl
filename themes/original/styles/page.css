@@ -30,6 +30,23 @@
    rather than by offsets: an offset box would become the heading's frame and
    take it along. A second box on the same page has no heading in it and is
    placed directly. */
+/* The title of a cover and of a section. It is anchored to its bottom edge,
+   so it grows upward and the gap to the text below holds however many lines
+   it takes. Each layout adds only its own left edge and width. */
+.tmpl-display,
+.section h1 {
+  position: absolute;
+  top: var(--tmpl-block-top);
+  height: var(--tmpl-title-height);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-size: var(--tmpl-display-size);
+  font-weight: 700;
+  line-height: var(--tmpl-line);
+}
+
 .tmpl-body {
   margin: calc(5 * var(--tmpl-cell)) 0 0 var(--tmpl-margin);
   width: var(--tmpl-content-width);

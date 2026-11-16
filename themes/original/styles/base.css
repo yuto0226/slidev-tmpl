@@ -44,6 +44,14 @@ html:root {
   --tmpl-margin: calc(2 * var(--tmpl-cell));
   --tmpl-content-width: calc(var(--tmpl-canvas-width) - 2 * var(--tmpl-margin));
 
+  /* A cover and a section carry the same block, three cells down rather than
+     centred, because a block on the geometric centre reads as sitting low.
+     The text begins where the title ends. */
+  --tmpl-block-top: calc(3 * var(--tmpl-cell));
+  --tmpl-title-height: calc(6 * var(--tmpl-cell));
+  --tmpl-text-top: calc(var(--tmpl-block-top) + var(--tmpl-title-height));
+  --tmpl-text-height: calc(4 * var(--tmpl-cell));
+
   /* Every size is a multiple of 12, so a line at 1.25 is a multiple of the
      half cell. What lands on the grid is the line box: CSS has no baseline of
      its own and splits the leading above and below the glyphs, so a baseline
