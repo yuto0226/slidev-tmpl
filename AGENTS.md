@@ -65,6 +65,17 @@ The golden ratio was tried for the title position and the column split, and drop
 - `two-cols`: a content page whose body splits into 13 cells, a two-cell gutter, and 13 cells.
   The right column takes the `::right::` slot.
 
+### Shortcuts
+
+`setup/shortcuts.ts` binds the authoring aids, all of them behind `import.meta.env.DEV`.
+A combination matches whenever its own keys are down and ignores whatever else is held at the same time, which is what a new binding has to work around.
+
+- No bare letter, since Slidev already took `d`, `f`, `g` and `o` and may take more.
+- No letter Slidev binds, `shift` or not: its `g` fires on `shift+g` too.
+- Exclude `ctrl` and `meta` in the key's own `computed`, or `ctrl+shift+r` cycles the guides on its way to reloading the page.
+
+Anything toggled this way also gets a button in `custom-nav-controls.vue`, which blurs itself so the keyboard keeps working after a click.
+
 ### Components
 
 - `Banner`: a rotated band across the middle of the slide.

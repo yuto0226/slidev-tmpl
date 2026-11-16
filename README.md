@@ -25,6 +25,28 @@ uv run pre-commit install
 `pnpm fonts` downloads and splits the fonts the themes declare; nothing renders correctly until it has run once.
 Traditional Chinese prose is linted with `zhtw-mcp`, which must be installed separately and on `PATH`.
 
+## Shortcuts
+
+The theme adds one, and only under `pnpm dev`.
+
+| Key       | Effect                                                                                                                                                     |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shift+r` | cycles the layout guides: off, the cells with every edge the layout placed, then the half cells as well. The ruler button in the bottom bar does the same. |
+
+Slidev's own, the ones worth having to hand while presenting.
+
+| Key                | Effect                                     |
+| ------------------ | ------------------------------------------ |
+| `space`, `→`       | next step                                  |
+| `shift+space`, `←` | previous step                              |
+| `↓`, `shift+→`     | next slide, skipping the steps it has left |
+| `↑`, `shift+←`     | previous slide                             |
+| `g`                | go to a slide by number                    |
+| `o`, `` ` ``       | overview of every slide                    |
+| `esc`              | leave the overview                         |
+| `d`                | light or dark                              |
+| `f`                | fullscreen                                 |
+
 ## References
 
 Presentation design has no specification the way the web does, and most of what search returns is template marketing.
