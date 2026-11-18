@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
       # setup-node's registry-url would set NODE_AUTH_TOKEN and take the publish
       # off the OIDC path, so the registry is left to npm's default.
