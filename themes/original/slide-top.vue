@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useCodeBand } from './composables/codeBand'
 import { useFootnoteHighlight } from './composables/footnoteHighlight'
-import { guideLevel } from './composables/guides'
+import { guidesOn, layers } from './lib/guides'
 
 const authoring = import.meta.env.DEV
 
@@ -13,25 +13,21 @@ const rows = ref([])
 useCodeBand(root)
 useFootnoteHighlight(root)
 
-/* The overlay is laid out in slide units and shown scaled, so the ratio of the
-   bounding width to offsetWidth converts a measurement back to slide units. */
-function measure() {
+function measureGuides() {
   const el = root.value
   if (!el) return
   const slide = el.getBoundingClientRect()
   const scale = slide.width / el.offsetWidth
   if (!scale) return
 
-  // The margin is drawn in CSS, and a box edge that lands on it is dropped
-  // here so the line keeps its own colour rather than showing blue through a
-  // translucent white.
   const margin = Number.parseFloat(getComputedStyle(el).getPropertyValue('--tmpl-margin'))
-  const edges = [margin, el.offsetWidth - margin]
-  const sides = [margin, el.offsetHeight - margin]
+  const marginXs = [margin, el.offsetWidth - margin]
+  const marginYs = [margin, el.offsetHeight - margin]
 
   const x = new Set()
   const y = new Set()
-  for (const box of el.parentElement.querySelectorAll('h1, .tmpl-body, .tmpl-box')) {
+  const measured = 'h1, .tmpl-body, .tmpl-measure, .tmpl-cols > *, .tmpl-rows > *'
+  for (const box of el.parentElement.querySelectorAll(measured)) {
     const r = box.getBoundingClientRect()
     if (!r.width || !r.height) continue
     x.add(Math.round((r.left - slide.left) / scale))
@@ -39,110 +35,123 @@ function measure() {
     y.add(Math.round((r.top - slide.top) / scale))
     y.add(Math.round((r.bottom - slide.top) / scale))
   }
-  cols.value = [...x].filter((at) => !edges.includes(at)).sort((a, b) => a - b)
-  rows.value = [...y].filter((at) => !sides.includes(at)).sort((a, b) => a - b)
+  cols.value = [...x].filter((at) => !marginXs.includes(at)).sort((a, b) => a - b)
+  rows.value = [...y].filter((at) => !marginYs.includes(at)).sort((a, b) => a - b)
 }
 
-/* Slidev mounts every slide at once and hides all but the current one with
-   v-show, so the first measurement runs against a display: none slide and gets
-   zero. Observing the size covers that, because becoming visible is a resize. */
-const observer = authoring ? new ResizeObserver(measure) : null
+/* Slidev hides non-current slides with v-show; becoming visible fires a resize. */
+const observer = authoring ? new ResizeObserver(measureGuides) : null
 
 onMounted(() => observer?.observe(root.value))
 onUnmounted(() => observer?.disconnect())
 
-watch(guideLevel, () => requestAnimationFrame(measure))
+watch([guidesOn, layers], () => requestAnimationFrame(measureGuides))
 </script>
 
 <template>
-  <!-- Slidev renders this layer inside every slide, so a line drawn at 30px
-       lands on the cell the layout was placed in. -->
-  <div ref="root" class="tmpl-guides">
-    <template v-if="authoring && guideLevel">
-      <div v-if="guideLevel === 2" class="tmpl-guides-grid tmpl-guides-halves" />
-      <div class="tmpl-guides-grid tmpl-guides-cells" />
-      <div
-        v-for="at in cols"
-        :key="`c${at}`"
-        class="tmpl-guides-col"
-        :style="{ left: `${at}px` }"
-      />
-      <div v-for="at in rows" :key="`r${at}`" class="tmpl-guides-row" :style="{ top: `${at}px` }" />
-      <div class="tmpl-guides-col tmpl-guides-margin" style="left: var(--tmpl-margin)" />
-      <div
-        class="tmpl-guides-col tmpl-guides-margin"
-        style="left: calc(100% - var(--tmpl-margin))"
-      />
-      <div class="tmpl-guides-row tmpl-guides-margin" style="top: var(--tmpl-margin)" />
-      <div
-        class="tmpl-guides-row tmpl-guides-margin"
-        style="top: calc(100% - var(--tmpl-margin))"
-      />
+  <div ref="root" class="guides">
+    <template v-if="authoring && guidesOn">
+      <template v-if="layers.halves">
+        <div class="guides-grid guides-halves guides-down" />
+        <div class="guides-grid guides-halves guides-across" />
+      </template>
+      <div v-if="layers.cells" class="guides-grid guides-cells guides-down guides-across" />
+      <template v-if="layers.edges">
+        <div v-for="at in cols" :key="`c${at}`" class="guides-col" :style="{ left: `${at}px` }" />
+        <div v-for="at in rows" :key="`r${at}`" class="guides-row" :style="{ top: `${at}px` }" />
+      </template>
+      <template v-if="layers.centre">
+        <div class="guides-col guides-centre" style="left: 50%" />
+        <div class="guides-row guides-centre" style="top: 50%" />
+      </template>
+      <template v-if="layers.margin">
+        <div class="guides-col guides-margin" style="left: var(--tmpl-margin)" />
+        <div class="guides-col guides-margin" style="left: calc(100% - var(--tmpl-margin))" />
+        <div class="guides-row guides-margin" style="top: var(--tmpl-margin)" />
+        <div class="guides-row guides-margin" style="top: calc(100% - var(--tmpl-margin))" />
+      </template>
     </template>
   </div>
 </template>
 
 <style>
-.tmpl-guides {
+.guides {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.tmpl-guides-grid {
+.guides-grid {
   position: absolute;
   inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      to right,
-      rgb(255 255 255 / var(--tmpl-guides-alpha)) 0 1px,
-      transparent 1px var(--tmpl-guides-step)
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      rgb(255 255 255 / var(--tmpl-guides-alpha)) 0 1px,
-      transparent 1px var(--tmpl-guides-step)
-    );
+  --guides-line: rgb(255 255 255 / var(--guides-alpha));
+  background-image: var(--guides-v, none), var(--guides-h, none);
 }
 
-.tmpl-guides-halves {
-  --tmpl-guides-alpha: 5%;
-  --tmpl-guides-step: var(--tmpl-half);
+.guides-down {
+  --guides-v: repeating-linear-gradient(
+    to right,
+    var(--guides-line) 0 1px,
+    transparent 1px var(--guides-step)
+  );
 }
 
-.tmpl-guides-cells {
-  --tmpl-guides-alpha: 10%;
-  --tmpl-guides-step: var(--tmpl-cell);
+.guides-across {
+  --guides-h: repeating-linear-gradient(
+    to bottom,
+    var(--guides-line) 0 1px,
+    transparent 1px var(--guides-step)
+  );
 }
 
-/* These colours are literals and not tokens, because an authoring aid that
-   took the theme's palette would disappear against a slide using it. */
-.tmpl-guides-col,
-.tmpl-guides-row {
+.guides-halves {
+  --guides-alpha: 8%;
+  --guides-step: var(--tmpl-half);
+}
+
+.guides-halves.guides-down {
+  mask-image: repeating-linear-gradient(to bottom, #000 0 2px, transparent 2px 4px);
+}
+
+.guides-halves.guides-across {
+  mask-image: repeating-linear-gradient(to right, #000 0 2px, transparent 2px 4px);
+}
+
+.guides-cells {
+  --guides-alpha: 10%;
+  --guides-step: var(--tmpl-cell);
+}
+
+.guides-col,
+.guides-row {
   position: absolute;
   background-image: repeating-linear-gradient(
-    var(--tmpl-guides-along),
-    var(--tmpl-guides-ink) 0 8px,
+    var(--guides-along),
+    var(--guides-ink) 0 8px,
     transparent 8px 16px
   );
-  --tmpl-guides-ink: #89b3fa;
+  --guides-ink: var(--tmpl-accent);
 }
 
-.tmpl-guides-margin {
-  --tmpl-guides-ink: rgb(255 255 255 / 45%);
+.guides-margin {
+  --guides-ink: rgb(255 255 255 / 45%);
 }
 
-.tmpl-guides-col {
+.guides-centre {
+  --guides-ink: color-mix(in srgb, var(--tmpl-danger) 55%, transparent);
+}
+
+.guides-col {
   top: 0;
   width: 1px;
   height: 100%;
-  --tmpl-guides-along: to bottom;
+  --guides-along: to bottom;
 }
 
-.tmpl-guides-row {
+.guides-row {
   left: 0;
   width: 100%;
   height: 1px;
-  --tmpl-guides-along: to right;
+  --guides-along: to right;
 }
 </style>
