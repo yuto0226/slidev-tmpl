@@ -7,12 +7,17 @@ import type { Plugin } from 'vite'
 const MODULE = 'virtual:tmpl-waves.css'
 const here = (name: string) => fileURLToPath(new URL(`./styles/${name}`, import.meta.url))
 
-const PATH = 'M0 4.5 C2 1.03 6 1.03 8 4.5 C10 7.97 14 7.97 16 4.5'
+/* The path runs a half period past each edge of the viewBox, which clips it, so the
+   stroke crosses the tile boundary instead of ending on it. A stroke that ends on the
+   boundary leaves a step there: its cap reaches past the endpoint along the tangent
+   and is cut off square. */
+const PATH =
+  'M-8 4.5 C-6 7.97 -2 7.97 0 4.5 C2 1.03 6 1.03 8 4.5 C10 7.97 14 7.97 16 4.5 C18 1.03 22 1.03 24 4.5'
 
 function wave(colour: string) {
   const svg =
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9' preserveAspectRatio='none'>` +
-    `<path d='${PATH}' fill='none' stroke='${colour}' stroke-width='3.2' stroke-linecap='round'/>` +
+    `<path d='${PATH}' fill='none' stroke='${colour}' stroke-width='3.2'/>` +
     `</svg>`
   return `url("data:image/svg+xml,${svg.replace(/</g, '%3C').replace(/>/g, '%3E').replace(/#/g, '%23')}")`
 }
