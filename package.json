@@ -14,8 +14,8 @@
     "site:index": "node site/build.mjs --index-only",
     "site:check": "node site/check.mjs",
     "site:serve": "pnpm dlx serve dist",
-    "fonts": "node scripts/fetch-fonts.mjs",
-    "fonts:check": "node scripts/fetch-fonts.mjs --check",
+    "fonts": "node scripts/fonts.mjs",
+    "fonts:check": "node scripts/fonts.mjs --check",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
