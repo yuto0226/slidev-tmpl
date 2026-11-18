@@ -55,11 +55,11 @@ repos:
         language: system
         files: ^docs/.*\.md$
 
-      # A deck marks a named slot with ::name::, which the colon rule reads
-      # as a Chinese sentence wanting a full-width colon.
+      # A deck's frontmatter is YAML, which the linter reads as prose, so this
+      # feeds it the slide bodies alone. The flags live in the script.
       - id: zhtw-deck
         name: zhtw-mcp (zh-TW prose, deck)
-        entry: zhtw-mcp lint --content-type markdown --off colon --max-warnings 0
+        entry: node scripts/zhtw.mjs
         language: system
         files: ^decks/.*\.md$
 
