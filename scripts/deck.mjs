@@ -1,5 +1,4 @@
-// dev falls back to DEFAULT rather than to whichever deck sorts first, so
-// adding a deck cannot change what `pnpm dev` opens.
+// dev falls back to DEFAULT, so adding a deck cannot change what `pnpm dev` opens.
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync } from 'node:fs'
 import path from 'node:path'
@@ -37,8 +36,7 @@ else if (!ONE_AT_A_TIME.has(script)) chosen = decks
 else if (decks.includes(DEFAULT)) chosen = [DEFAULT]
 else fail(`pnpm ${script} takes one deck and there is no ${DEFAULT}\n  ${decks.join('\n  ')}`)
 
-// Node refuses to spawn a .cmd, so this runs the deck's own Slidev rather
-// than pnpm's shim. dev is Slidev's default verb and passes none.
+// Node refuses to spawn a .cmd, so this runs the deck's own Slidev rather than pnpm's shim.
 for (const deck of chosen) {
   const dir = path.join(decksDir, deck)
   const cli = path.join(dir, 'node_modules', '@slidev', 'cli', 'bin', 'slidev.mjs')
