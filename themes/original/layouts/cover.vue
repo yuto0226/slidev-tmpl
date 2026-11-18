@@ -1,9 +1,9 @@
 <template>
   <div class="slidev-layout cover">
-    <div class="cover-title tmpl-box tmpl-display">
+    <div class="cover-title tmpl-measure tmpl-display">
       <slot />
     </div>
-    <div class="cover-subtitle tmpl-box">
+    <div class="cover-subtitle tmpl-measure">
       {{ $frontmatter.subtitle }}
     </div>
     <div class="cover-bar" />
@@ -40,7 +40,7 @@
   left: 0;
   bottom: 0;
   width: var(--tmpl-canvas-width);
-  height: var(--tmpl-half);
+  height: var(--tmpl-cell);
   background: var(--tmpl-mark);
 }
 </style>

@@ -9,23 +9,21 @@
 
 <style>
 .section {
-  --section-x: calc(3 * var(--tmpl-cell));
-  --section-width: calc(var(--tmpl-canvas-width) - var(--section-x) - var(--tmpl-margin));
+  --tmpl-body-x: calc(4 * var(--tmpl-cell));
+  --tmpl-body-width: calc(var(--tmpl-canvas-width) - var(--tmpl-body-x) - var(--tmpl-margin));
 }
 
 .section h1 {
-  left: var(--section-x);
-  width: var(--section-width);
+  left: var(--tmpl-body-x);
+  width: var(--tmpl-body-width);
 }
 
 .section-body {
-  margin: var(--tmpl-text-top) 0 0 var(--section-x);
-  width: var(--section-width);
+  margin: var(--tmpl-text-top) 0 0 var(--tmpl-body-x);
+  width: var(--tmpl-body-width);
   height: var(--tmpl-text-height);
 }
 
-/* The children are muted and not the body box, so the h1 does not have to undo
-   it. */
 .section-body > :not(h1) {
   color: var(--tmpl-muted);
 }
@@ -34,7 +32,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: var(--tmpl-half);
+  width: var(--tmpl-cell);
   height: var(--tmpl-canvas-height);
   background: var(--tmpl-mark);
 }
