@@ -1,6 +1,4 @@
-/* Below 78rem there is no margin to stand in, so the rail lies under the
-   header as names alone, because ticks say nothing once they wrap across
-   lines. */
+/* Below 78rem there is no margin to stand in, so the rail lies under the header as names alone. */
 .rail {
   display: flex;
   flex-wrap: wrap;
@@ -44,8 +42,6 @@ html {
 }
 
 @media (min-width: 78rem) {
-  /* A cell of air on each side, because the ticks measure the page and stop
-     reading that way once they touch the slides. */
   .rail {
     position: fixed;
     top: 50%;

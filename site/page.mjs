@@ -8,11 +8,9 @@ const title = "Yuto's Slidev Template"
 const description = 'Yuto 做簡報用的 Slidev 主題都放在這裡，一個場合一套，每套附一份展示用的 deck。'
 
 const entities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }
-const escape = (text) => String(text).replace(/[&<>"]/g, (char) => entities[char])
+const escapeHtml = (text) => String(text).replace(/[&<>"]/g, (char) => entities[char])
 
-// A placeholder alone on its line takes the line with it when its value is
-// empty. Prettier reformats an html`` template, including the indentation this
-// reads, so the tag is named markup.
+// A placeholder alone on its line takes the line with it when empty. Prettier reformats html`` templates, so the tag is named markup.
 function markup(strings, ...values) {
   let out = strings[0]
   for (let at = 0; at < values.length; at++) {
@@ -33,7 +31,7 @@ function specs(deck) {
   const rows = [
     ['canvas', `${deck.width} × ${deck.height}pt`],
     ['grid', `${deck.cell}pt cell, ${deck.columns} × ${deck.rows}`],
-    ['type', `${deck.title_size}pt title / ${deck.body_size}pt body`],
+    ['type', `${deck.titleSize}pt title / ${deck.bodySize}pt body`],
     ['sans', stack(deck.fonts.sans)],
     ['mono', stack(deck.fonts.mono)],
     ['layouts', deck.layouts.join(', ')],
@@ -41,7 +39,7 @@ function specs(deck) {
 
   return rows
     .filter(([, value]) => value)
-    .map(([key, value]) => `<div><dt>${key}</dt><dd>${escape(value)}</dd></div>`)
+    .map(([key, value]) => `<div><dt>${key}</dt><dd>${escapeHtml(value)}</dd></div>`)
 }
 
 function card(deck, { base }, first) {
@@ -52,7 +50,7 @@ function card(deck, { base }, first) {
     `<a class="shot" href="${target}"><img src="${href}preview/${slide}.png" alt="${alt}"${eager ? '' : ' loading="lazy"'} width="${deck.width}" height="${deck.height}"></a>`
 
   const plate = markup`<div class="plate" style="--columns: ${deck.columns}; --rows: ${deck.rows}">
-  ${shot(cover, href, `${escape(deck.title)} 的封面`, first)}
+  ${shot(cover, href, `${escapeHtml(deck.title)} 的封面`, first)}
   <span class="ticks ticks-x" aria-hidden="true"></span>
   <span class="ticks ticks-y" aria-hidden="true"></span>
   <span class="rule rule-x" aria-hidden="true" style="--measure: ${deck.width}"><i>${deck.width}</i></span>
@@ -60,15 +58,15 @@ function card(deck, { base }, first) {
 </div>`
 
   const prints = rest.map((slide) =>
-    shot(slide, `${href}#${slide}`, `${escape(deck.title)} 第 ${slide} 頁`, false),
+    shot(slide, `${href}#${slide}`, `${escapeHtml(deck.title)} 第 ${slide} 頁`, false),
   )
 
   return markup`<li class="theme" id="${deck.name}">
   <h2 class="name">
-    <a href="${href}">${escape(deck.title)}</a>
+    <a href="${href}">${escapeHtml(deck.title)}</a>
     <span>${deck.count} slides</span>
   </h2>
-  <p class="about">${escape(deck.description)}</p>
+  <p class="about">${escapeHtml(deck.description)}</p>
   <div class="sheet">
     ${plate}
     ${prints}
@@ -79,16 +77,15 @@ function card(deck, { base }, first) {
 </li>`
 }
 
-// A crawler has no page to resolve a relative URL against, so these are
-// emitted only when the origin they need is given.
+// A crawler cannot resolve a relative URL, so these need the origin.
 function sharing(decks, { base, origin }) {
   if (!origin) return ''
   const first = decks[0]
   // Slides are exported at twice the canvas.
   const scale = 2
   return `<meta property="og:type" content="website">
-<meta property="og:title" content="${escape(title)}">
-<meta property="og:description" content="${escape(description)}">
+<meta property="og:title" content="${escapeHtml(title)}">
+<meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:url" content="${origin}${base}">
 <meta property="og:image" content="${origin}${base}t/${first.name}/preview/${first.preview[0]}.png">
 <meta property="og:image:width" content="${first.width * scale}">
@@ -98,7 +95,7 @@ function sharing(decks, { base, origin }) {
 
 function rail(decks) {
   return markup`<nav class="rail" aria-label="主題">
-  ${decks.map((deck) => `<a href="#${deck.name}"><i></i><span>${escape(deck.title)}</span></a>`)}
+  ${decks.map((deck) => `<a href="#${deck.name}"><i></i><span>${escapeHtml(deck.title)}</span></a>`)}
 </nav>`
 }
 
@@ -107,9 +104,7 @@ const githubMark = `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden=
 export function page(decks, site) {
   const listed = decks.length > 1
 
-  // The faces the build actually copied. Spelling a family in the stylesheet
-  // instead let the two disagree in silence, and the page fell back to a
-  // system face with every check still passing.
+  // The faces the build copied, so a family spelled in the stylesheet cannot disagree with them.
   const faces = site.fonts.map(({ role, family }) => `--${role}: '${family}';`)
 
   return markup`<!doctype html>
@@ -117,8 +112,8 @@ export function page(decks, site) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escape(title)}</title>
-<meta name="description" content="${escape(description)}">
+<title>${escapeHtml(title)}</title>
+<meta name="description" content="${escapeHtml(description)}">
 ${sharing(decks, site)}
 <link rel="stylesheet" href="${site.base}fonts/fonts.css">
 <style>
@@ -139,7 +134,7 @@ ${listed ? railStyle : ''}
   <ul>
     ${decks.map((deck, at) => card(deck, site, at === 0))}
   </ul>
-  <footer><a href="${site.repo}">${githubMark}${escape(site.repo.replace(/^https?:\/\/github\.com\//, ''))}</a></footer>
+  <footer><a href="${site.repo}">${githubMark}${escapeHtml(site.repo.replace(/^https?:\/\/github\.com\//, ''))}</a></footer>
 </main>
 ${listed ? `<script>\n${railScript}</script>` : ''}
 </body>

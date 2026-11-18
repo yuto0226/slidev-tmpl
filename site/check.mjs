@@ -1,5 +1,3 @@
-// This checks only that the output refers to things that exist. Looks and
-// behaviour are read on the page itself.
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
@@ -22,8 +20,6 @@ const read = (file) => readFileSync(file, 'utf8')
 
 const markup = read(path.join(sourceDir, 'page.mjs'))
 
-// Read off page.mjs rather than listed again here, because a file nobody
-// remembered to add to a list is the defect this check exists for.
 const sources = [...markup.matchAll(/new URL\('\.\/([^']+)'/g)].map((match) => match[1])
 check('page.mjs names the files it inlines', sources.length > 0)
 
@@ -33,9 +29,7 @@ const styles = sources
   .join('\n')
 check('the page inlines a stylesheet', styles.length > 0)
 
-// Reading a property nothing declares is not an error anywhere. The
-// declaration holds its initial value for ever, so a scale goes on being drawn
-// while it has quietly stopped moving.
+// Reading an undeclared property is not an error; it silently keeps its initial value.
 const declared = new Set([
   ...[...styles.matchAll(/(?:^|[;{]|@property)\s*(--[\w-]+)\s*[:{\n]/gm)].map((m) => m[1]),
   ...[...markup.matchAll(/(--[\w-]+):/g)].map((m) => m[1]),
@@ -56,9 +50,7 @@ const unread = [...declared].filter(
 )
 check('no custom property is declared and never read', unread.length === 0, unread.join(', '))
 
-// A clean checkout has to build, so everything the build reads must be
-// tracked. Only an untracked file on disk can fail this and a CI checkout has
-// none, so it runs in the pre-commit hook.
+// Only an untracked file can break a clean checkout, and CI has none, so this runs pre-commit.
 const tracked = new Set(
   execFileSync('git', ['ls-files', 'site'], { cwd: root, encoding: 'utf8' })
     .split('\n')
@@ -91,8 +83,6 @@ if (!existsSync(path.join(outDir, 'index.html'))) {
     dangling.join(', '),
   )
 
-  // A face the page asks for that the build did not ship falls back to a system
-  // font and looks almost right, which is the kind of wrong nothing reports.
   for (const { role, family } of indexFonts) {
     check(`the page is given its ${role} face`, html.includes(`--${role}: '${family}'`))
   }
@@ -100,9 +90,9 @@ if (!existsSync(path.join(outDir, 'index.html'))) {
   const fontCss = path.join(outDir, 'fonts', 'fonts.css')
   check('fonts.css was written', existsSync(fontCss))
   if (existsSync(fontCss)) {
-    const faces = [...read(fontCss).matchAll(/url\("([^"]+)"\)/g)].map((match) => match[1])
-    check('fonts.css declares faces', faces.length > 0)
     const css = read(fontCss)
+    const faces = [...css.matchAll(/url\("([^"]+)"\)/g)].map((match) => match[1])
+    check('fonts.css declares faces', faces.length > 0)
     for (const { family } of indexFonts) {
       check(`fonts.css carries ${family}`, css.includes(`font-family:"${family}"`))
     }
@@ -123,9 +113,7 @@ if (!existsSync(path.join(outDir, 'index.html'))) {
   }
 }
 
-// The build decides which chunks a deck keeps. This asks the built deck
-// whether they cover what it says, because an uncovered glyph falls back to a
-// system font and reports nothing.
+// An uncovered glyph falls back silently, so this checks the chunks the build kept.
 function deck(name, page) {
   const dir = path.dirname(page)
   const assets = path.join(dir, 'assets')
@@ -135,8 +123,7 @@ function deck(name, page) {
     .map((file) => path.join(assets, file))
     .filter((file) => statSync(file).isFile())
 
-  // A preload href carries the site's base path, which is whatever --base was
-  // given, so it is matched from the deck's own directory onward instead.
+  // Preload hrefs carry --base, so match from the deck's own directory onward.
   const here = path.relative(outDir, dir).split(path.sep).join('/')
   const missing = [...read(page).matchAll(/rel="preload" as="font"[^>]*href="([^"]+)"/g)]
     .map((match) => match[1])
@@ -165,8 +152,7 @@ function deck(name, page) {
   }
   if (covered.length === 0) return
 
-  // Latin and punctuation ride in faces that carry no range at all, so only
-  // what a range could answer for is asked about.
+  // Latin and punctuation ride in faces with no range.
   const uncovered = new Set()
   for (const body of text) {
     for (const char of body) {

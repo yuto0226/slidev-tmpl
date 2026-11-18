@@ -2,13 +2,11 @@
   color-scheme: light;
   --cell: 30px;
   --half: calc(var(--cell) / 2);
-  /* Grey throughout, so the covers are the only colour on the page. */
   --paper: #f6f6f6;
   --minor: #e8e8e8;
   --major: #d6d6d6;
   --ink: #1a1a1a;
-  /* Muted text at 4.8:1 on the paper. The drawn lines carry no words, so
-     they sit lighter, at the 3:1 a graphic needs. */
+  /* Text is 4.8:1 on the paper, and the wordless drawn lines are the 3:1 a graphic needs. */
   --pencil: #6e6e6e;
   --draft: #8c8c8c;
   --slide: 960px;
@@ -18,8 +16,7 @@
   box-sizing: border-box;
 }
 
-/* A line on the horizontal centre puts the edges of the 32-cell column on
-   lines at any viewport width. */
+/* A line on the horizontal centre puts the edges of the 32-cell column on lines at any width. */
 body {
   margin: 0;
   padding: calc(2 * var(--cell)) var(--cell) calc(4 * var(--cell));
@@ -46,8 +43,7 @@ body {
     monospace;
 }
 
-/* The extra cell on each side is the clear space the construction box needs,
-   so the image is exactly 32 cells. */
+/* The extra cell on each side is the construction box's clear space, so the image is 32 cells. */
 main {
   width: min(calc(var(--slide) + 2 * var(--cell)), 100%);
   margin: 0 auto;
@@ -90,16 +86,13 @@ ul {
   margin-top: calc(4 * var(--cell));
 }
 
-/* The cover is not the most informative slide, so all of them are set at one
-   size, two cells apart. */
 .sheet {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: calc(2 * var(--cell));
 }
 
-/* The frame and its scales are absolutely positioned so .plate measures
-   exactly the slide. */
+/* Absolutely positioned so .plate measures exactly the slide. */
 .plate {
   position: relative;
 }
@@ -110,8 +103,7 @@ ul {
   border: 1px dashed var(--draft);
 }
 
-/* --zoom is registered as a number so it can transition, and it scales the
-   tick periods so the scale reads the slide at its drawn size. */
+/* --zoom is registered as a number so it can transition. */
 @property --zoom {
   syntax: '<number>';
   inherits: true;
@@ -120,10 +112,7 @@ ul {
 .ticks {
   position: absolute;
 }
-/* The tiles are centred rather than run from a corner so the scale opens from
-   the middle as the period grows, which a gradient phased from the left edge
-   cannot do. The long tick is 2px to the short tick's 1px so it covers the
-   short one where the two tilings land a rounding apart. */
+/* The long tick is 2px to the short tick's 1px so it covers the short one where the tilings land a rounding apart. */
 .ticks-x {
   top: -9px;
   right: 0;
@@ -173,10 +162,7 @@ ul {
     4px calc(var(--zoom) * 100% / var(--rows));
 }
 
-/* One value drives the hover. The slide is drawn larger inside its frame and
-   both scales open by the same factor about the same centre line, so they go
-   on measuring what is on screen. The hatched shadow belongs to the loose
-   prints and is taken off this one. */
+/* Both scales open by the same factor about the same centre line, so they keep measuring what is on screen. */
 .plate {
   --zoom: 1;
   transition: --zoom 220ms ease-out;
@@ -247,9 +233,7 @@ ul {
   width: 1px;
 }
 
-/* The number follows what is on screen, so zoomed in the rule reads less. The
-   markup carries the unzoomed figure for browsers without the counter
-   arithmetic. */
+/* The markup carries the unzoomed figure for browsers without counter arithmetic. */
 @supports (content: counter(measure)) and (width: round(down, 1px, 1px)) {
   .rule i {
     font-size: 0;
@@ -285,10 +269,7 @@ ul {
   font-size: 13px;
 }
 
-/* This stays in the monospace face because the rounded face's chunks are cut
-   so fine that one CJK sentence pulls seventeen of them, about 400 KB. The
-   measure of about 34 characters keeps it one sentence rather than two
-   stranded fragments. */
+/* The rounded face's chunks are cut so fine that one CJK sentence pulls seventeen, about 400 KB, so this stays monospace. */
 .about {
   max-width: calc(19 * var(--cell));
   margin: calc(var(--cell) / 2) 0 0;
@@ -301,8 +282,6 @@ ul {
   margin-top: calc(2 * var(--cell));
 }
 
-/* Hatched and offset rather than blurred, which would be the only soft edge in
-   the drawing. */
 .shot {
   position: relative;
   display: block;
@@ -337,8 +316,6 @@ ul {
   background: #1e1e2e;
 }
 
-/* One column, because two made the reader work out whether it ran across or
-   down. */
 .spec {
   margin: calc(2 * var(--cell)) 0 0;
   font-size: 13px;
