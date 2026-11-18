@@ -28,7 +28,7 @@ Slidev offers to install the theme the first time it reads that line.
 | `two-cols`, `two-cols-header`, `two-rows` | a slide split into named slots        |
 | `fact`, `statement`, `quote`              | one number, one sentence, a quotation |
 | `image`, `image-left`, `image-right`      | a picture, bled or beside the text    |
-| `figure`                                  | a picture with a caption and a credit |
+| `figure`                                  | a figure beside the text              |
 | `full`                                    | the body with no title                |
 | `outline`, `references`                   | an agenda, a bibliography             |
 | `end`                                     | the closing slide                     |
@@ -39,10 +39,12 @@ Slidev offers to install the theme the first time it reads that line.
 | ------------ | ----------------------------------------------------- |
 | `MemoryDump` | a hex dump whose writes land click by click           |
 | `StackFrame` | a stack that fills as the writing reaches each region |
-| `Figure`     | a picture with a credit line, opening into a lightbox |
+| `Figure`     | a picture with its credit underneath                  |
 | `License`    | a Creative Commons card                               |
 | `Banner`     | a strip across the slide                              |
 | `PageNumber` | the page number, a cell inside the corner             |
+
+Any picture on a slide opens into a lightbox when it is clicked.
 
 Code blocks take Shiki's `{1,3-5}` line ranges, and `// [!code bp]` marks a breakpoint. Markdown
 gains `==mark==`, `++ins++`, `~sub~`, `^sup^`, `{.class}` attributes, and Obsidian's callout set on

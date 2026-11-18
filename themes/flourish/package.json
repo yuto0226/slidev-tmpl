@@ -1,6 +1,6 @@
 {
   "name": "@yuto0226/flourish",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "資安與系統技術的教學、分享與研討會簡報。深色底，內建程式碼、記憶體和堆疊圖等講解用的元件。",
   "keywords": [
