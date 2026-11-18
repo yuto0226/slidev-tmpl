@@ -6,8 +6,6 @@ on:
     paths: ['themes/flourish/**']
   workflow_dispatch:
 
-# npm mints a short-lived registry credential from the id-token, and the tag is
-# written back after a release lands.
 permissions:
   contents: write
   id-token: write
@@ -23,8 +21,7 @@ jobs:
 
       - uses: pnpm/action-setup@v6
 
-      # setup-node's registry-url would set NODE_AUTH_TOKEN and take the publish
-      # off the OIDC path, so the registry is left to npm's default.
+      # registry-url would set NODE_AUTH_TOKEN and take the publish off the OIDC path.
       - uses: actions/setup-node@v5
         with:
           node-version: 22
@@ -37,8 +34,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
         working-directory: .
 
-      # The version in the manifest is the release trigger. A package that is not
-      # published yet has no version to compare against.
       - id: version
         run: |
           local="$(node -p "require('./package.json').version")"
@@ -55,7 +50,6 @@ jobs:
         run: pnpm lint
         working-directory: .
 
-      # prepack builds the fonts from fonts.toml, so the tarball cannot ship a stale set.
       - if: steps.version.outputs.release == 'yes'
         run: npm publish --provenance --access public
 
