@@ -1,5 +1,5 @@
 {
-  "name": "deck-original",
+  "name": "deck-flourish",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "export": "slidev export slides.md"
   },
   "dependencies": {
-    "slidev-theme-original": "workspace:*"
+    "@yuto0226/flourish": "workspace:*"
   },
   "devDependencies": {
     "@slidev/cli": "^53.1.0",

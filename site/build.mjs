@@ -97,7 +97,7 @@ async function readDeck(name) {
     name,
     dir,
     theme: themeName,
-    title: (theme.name ?? themeName).replace(/^slidev-theme-/, ''),
+    title: (theme.name ?? themeName).replace(/^@[^/]+\//, '').replace(/^slidev-theme-/, ''),
     preview: head.preview ?? [1],
     count: parsed.slides.length,
     description: theme.description ?? '',

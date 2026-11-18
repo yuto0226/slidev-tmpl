@@ -48,11 +48,11 @@ importers:
         specifier: ^3.5.45
         version: 3.5.45(typescript@6.0.3)
 
-  decks/original:
+  decks/flourish:
     dependencies:
-      slidev-theme-original:
+      '@yuto0226/flourish':
         specifier: workspace:*
-        version: link:../../themes/original
+        version: link:../../themes/flourish
     devDependencies:
       '@slidev/cli':
         specifier: ^53.1.0
@@ -61,8 +61,8 @@ importers:
         specifier: ^1.65.1
         version: 1.65.1
 
-  themes/original:
-    devDependencies:
+  themes/flourish:
+    dependencies:
       '@iconify-json/carbon':
         specifier: ^1.2.30
         version: 1.2.30
@@ -75,9 +75,6 @@ importers:
       '@shikijs/transformers':
         specifier: ^4.6.0
         version: 4.6.0
-      '@types/markdown-it':
-        specifier: ^14.2.0
-        version: 14.2.0
       markdown-it-attrs:
         specifier: ^4.3.1
         version: 4.5.0(markdown-it@15.0.3)
@@ -99,6 +96,10 @@ importers:
       markdown-it-sup:
         specifier: ^2.0.0
         version: 2.0.0
+    devDependencies:
+      '@types/markdown-it':
+        specifier: ^14.2.0
+        version: 14.2.0
       vite:
         specifier: ^8.3.8
         version: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)(yaml@2.9.1)

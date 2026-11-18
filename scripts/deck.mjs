@@ -3,7 +3,7 @@ import { existsSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const DEFAULT = 'original'
+const DEFAULT = 'flourish'
 const ONE_AT_A_TIME = new Set(['dev'])
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')

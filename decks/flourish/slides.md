@@ -1,5 +1,5 @@
 ---
-theme: ../../themes/original
+theme: ../../themes/flourish
 titleTemplate: '%s'
 layout: cover
 title: Original # display as html title

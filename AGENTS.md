@@ -59,7 +59,7 @@ The golden ratio was tried for the title position and the column split, and drop
 
 ## Themes
 
-`themes/original` is the only theme so far.
+`themes/flourish` is the only theme so far.
 
 ### Layouts
 
@@ -141,7 +141,7 @@ A thematic break is written `<hr />`, because Prettier normalises `***` and `___
 
 ## What the theme extends
 
-`themes/original/vite.config.ts` is the only build configuration.
+`themes/flourish/vite.config.ts` is the only build configuration.
 Everything else a deck can do is a Slidev feature or plain CSS.
 
 - `transition: view-transition` on a slide, plus a class on an element of both slides whose CSS sets `view-transition-name`, animates one into the other.
@@ -283,7 +283,7 @@ TC (丹版) is the traditional letterpress forms, for book typesetting and class
 ```bash
 pnpm install          # once per clone
 pnpm fonts            # once per clone, and whenever fonts.toml changes
-pnpm dev [deck]       # dev server; with no deck, original
+pnpm dev [deck]       # dev server; with no deck, flourish
 pnpm build [deck]     # static SPA per deck; with no deck, every one
 pnpm fit [deck]       # every slide measured against its boxes
 ```
@@ -291,7 +291,7 @@ pnpm fit [deck]       # every slide measured against its boxes
 `dev`, `build`, `export` and `site` run `pnpm fonts:check` first, which fails when `styles/fonts.css` is missing.
 
 `pnpm export` produces a PDF, and `--format pptx-editable` an editable deck.
-It needs `playwright-chromium` in the deck package, which `decks/original` already declares.
+It needs `playwright-chromium` in the deck package, which `decks/flourish` already declares.
 
 Exported `.pptx` is a one-way hand-off format.
 Edits made in PowerPoint do not come back, and SVG, canvas, iframes and KaTeX stay as images.
@@ -387,7 +387,7 @@ The rest judge the writing and can be wrong, so they print and the writer decide
 ### Messages
 
 - Use `type(scope): subject`.
-  Scopes are the theme, deck or area (`original`, `demo`, `layout`, `component`, `font`, `tooling`), omitted for changes spanning the whole repository.
+  Scopes are the theme, deck or area (`flourish`, `demo`, `layout`, `component`, `font`, `tooling`), omitted for changes spanning the whole repository.
 - Allowed types are `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`, `build`, `perf` and `style`.
 - The subject is a lowercase imperative phrase with no trailing punctuation, and the header is at most 72 characters.
 - Separate an optional body from the header with a blank line and wrap it at 72 characters.

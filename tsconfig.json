@@ -11,6 +11,6 @@
     "verbatimModuleSyntax": true,
     "types": ["node"]
   },
-  "include": ["themes/original/**/*.ts", "themes/original/**/*.d.ts"],
+  "include": ["themes/flourish/**/*.ts", "themes/flourish/**/*.d.ts"],
   "exclude": ["**/node_modules", "themes/original/styles/fonts"]
 }

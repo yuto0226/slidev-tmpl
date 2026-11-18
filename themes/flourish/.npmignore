@@ -1,0 +1,1 @@
+# Without this file npm falls back to the repository's .gitignore, which excludes the generated fonts.
