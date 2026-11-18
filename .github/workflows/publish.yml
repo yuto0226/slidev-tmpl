@@ -1,0 +1,55 @@
+name: publish
+
+on:
+  push:
+    tags: ['flourish-v*']
+  workflow_dispatch:
+
+# npm mints a short-lived registry credential from this token, so no secret is stored.
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: themes/flourish
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      # setup-node's registry-url would set NODE_AUTH_TOKEN and take the publish
+      # off the OIDC path, so the registry is left to npm's default.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Trusted publishing needs npm 11.5.1, and the node image ships an older one.
+      - run: npm install -g npm@latest
+        working-directory: .
+
+      - run: pnpm install --frozen-lockfile
+        working-directory: .
+
+      - name: The tag and the manifest must name the same version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tagged="${GITHUB_REF_NAME#flourish-v}"
+          manifest="$(node -p "require('./package.json').version")"
+          test "$tagged" = "$manifest" || {
+            echo "tag says $tagged, package.json says $manifest"
+            exit 1
+          }
+
+      - run: pnpm typecheck
+        working-directory: .
+
+      - run: pnpm lint
+        working-directory: .
+
+      # prepack builds the fonts from fonts.toml, so the tarball cannot ship a stale set.
+      - run: npm publish --provenance --access public
