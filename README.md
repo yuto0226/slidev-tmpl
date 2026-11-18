@@ -29,9 +29,9 @@ Traditional Chinese prose is linted with `zhtw-mcp`, which must be installed sep
 
 The theme adds one, and only under `pnpm dev`.
 
-| Key       | Effect                                                                                                                                                     |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `shift+r` | cycles the layout guides: off, the cells with every edge the layout placed, then the half cells as well. The ruler button in the bottom bar does the same. |
+| Key       | Effect                                                                                                                                              |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shift+r` | shows or hides the layout guides, as the ruler button in the bottom bar does. Which layers show is chosen in that button's panel and is remembered. |
 
 Slidev's own, the ones worth having to hand while presenting.
 
