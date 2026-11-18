@@ -1,6 +1,4 @@
-// A Slidev SPA bakes its base path into asset URLs at build time and Pages
-// serves a project site under the repository name, so --base is passed in
-// rather than discovered.
+// Slidev bakes the base path into asset URLs, so --base is passed in.
 
 import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -22,33 +20,47 @@ function flag(name, fallback) {
 const trimmed = flag('base', '/').replace(/^\/+|\/+$/g, '')
 const base = trimmed ? `/${trimmed}/` : '/'
 
-// Rewriting the index takes 0.3 seconds against 18 for a deck, and leaving the
-// decks in dist/ alone lets it describe one older than itself.
 const indexOnly = process.argv.includes('--index-only')
 
-// Pages reports a custom domain over http until HTTPS is enforced on it, and
-// a crawler takes og:url literally, so anything that is not a local preview is
-// named by https.
+// Pages reports a custom domain as http until HTTPS is enforced, and crawlers take og:url literally.
 const given = (flag('origin', '') || '').replace(/\/+$/, '')
 const origin = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|$)/.test(given)
   ? given
   : given.replace(/^http:\/\//, 'https://')
 
-// Slidev's own entry rather than `pnpm exec`, because the .CMD shim needs a
-// shell on Windows and a shell needs the arguments quoted differently again.
+// The .CMD shim needs a shell on Windows, so Slidev's own entry is run through node.
 function slidev(deck, args) {
   const cli = path.join(deck.dir, 'node_modules', '@slidev', 'cli', 'bin', 'slidev.mjs')
   execFileSync(process.execPath, [cli, ...args], { cwd: deck.dir, stdio: 'inherit' })
 }
 
-// Reading the grid from base.css keeps the index from drifting, and throwing
-// on a renamed token stops "null" reaching the page, where it would read as a
-// fact.
-function pixels(css, theme, name) {
-  const match = css.match(new RegExp(`--tmpl-${name}:\\s*([^;]+);`))
-  if (!match) throw new Error(`${theme}: base.css declares no --tmpl-${name}`)
-  const value = Number.parseInt(match[1], 10)
-  if (!Number.isFinite(value)) throw new Error(`${theme}: --tmpl-${name} is not a length`)
+// Throws so a renamed token cannot put "null" on the page.
+// rem resolves against the 16px root a slide runs on.
+const ROOT_FONT = 16
+
+function lengthPx(baseCss, theme, token, seen = new Set()) {
+  if (seen.has(token)) throw new Error(`${theme}: --tmpl-${token} refers to itself`)
+  const match = baseCss.match(new RegExp(`--tmpl-${token}:\\s*([^;]+);`))
+  if (!match) throw new Error(`${theme}: base.css declares no --tmpl-${token}`)
+
+  const bare = match[1].replace(/var\(--tmpl-[\w-]+\)/g, '1').replace(/calc\(|\)/g, '')
+  if (/[/+]|\s-\s/.test(bare))
+    throw new Error(
+      `${theme}: --tmpl-${token} is "${match[1].trim()}", which this build reads only as a product`,
+    )
+
+  const value = match[1]
+    .replace(/calc\(|\)/g, '')
+    .trim()
+    .split('*')
+    .map((term) => {
+      const inner = term.match(/var\(--tmpl-([\w-]+)/)
+      if (inner) return lengthPx(baseCss, theme, inner[1], new Set([...seen, token]))
+      return Number.parseFloat(term) * (/rem/.test(term) ? ROOT_FONT : 1)
+    })
+    .reduce((product, term) => product * term, 1)
+
+  if (!Number.isFinite(value)) throw new Error(`${theme}: --tmpl-${token} is not a length`)
   return value
 }
 
@@ -82,13 +94,13 @@ async function readDeck(name) {
   const width = config.canvasWidth
   const height = Math.round(width / config.aspectRatio)
   const themeName = path.basename(themeDir)
-  const cell = pixels(css, themeName, 'cell')
+  const cell = lengthPx(css, themeName, 'cell')
 
   return {
     name,
     dir,
     theme: themeName,
-    title: head.title ?? name,
+    title: (theme.name ?? themeName).replace(/^slidev-theme-/, ''),
     preview: head.preview ?? [1],
     count: parsed.slides.length,
     description: theme.description ?? '',
@@ -102,16 +114,13 @@ async function readDeck(name) {
     cell,
     columns: width / cell,
     rows: height / cell,
-    title_size: pixels(css, themeName, 'title-size'),
-    body_size: pixels(css, themeName, 'body-size'),
+    titleSize: lengthPx(css, themeName, 'title-size'),
+    bodySize: lengthPx(css, themeName, 'body-size'),
   }
 }
 
-// The unicode-range pattern does not require a trailing semicolon, because the
-// bundler drops it, and a version that required one silently kept every face.
-// Filtering to the codepoints a page sets turns ~25 MB and 300 rules into a
-// handful.
-function wanted(rule, codepoints) {
+// The bundler drops the trailing semicolon, so the unicode-range pattern must not require one.
+function covers(rule, codepoints) {
   const range = /unicode-range:([^;}]+)/.exec(rule)
   if (!range) return true
 
@@ -124,15 +133,12 @@ function wanted(rule, codepoints) {
   })
 }
 
-// Slidev emits a chunk for every face the theme ships, and a built deck's text
-// is fixed, so the chunks it can ask for are known. What is kept is preloaded,
-// because a unicode-range face is otherwise fetched when its glyph is first
-// painted, which is the moment the slide appears in front of an audience.
+// A unicode-range face is otherwise fetched when its glyph is first painted.
 async function narrowDeckFonts(out, base) {
   const assets = path.join(out, 'assets')
   if (!existsSync(assets)) return
 
-  // Slidev nests some of its own chunks, and the font chunks sit at the top.
+  // Slidev nests some chunks; the font chunks sit at the top.
   const entries = await readdir(assets, { withFileTypes: true, recursive: true })
   const files = entries
     .filter((entry) => entry.isFile())
@@ -160,12 +166,11 @@ async function narrowDeckFonts(out, base) {
   let dropped = 0
   for (const sheet of sheets) {
     const narrowed = sheet.body.replace(/@font-face\{[^}]*\}/g, (rule) => {
-      if (!wanted(rule, codepoints)) {
+      if (!covers(rule, codepoints)) {
         dropped += 1
         return ''
       }
-      // Vite inlines a small face as a data URI, which is already in the
-      // sheet and names no file.
+      // Vite inlines small faces as data URIs, which name no file.
       const url = /url\(([^)]+)\)/.exec(rule)
       const href = url?.[1].replace(/["']/g, '')
       if (href?.endsWith('.woff2')) keep.add(path.basename(href))
@@ -201,7 +206,6 @@ async function copyFonts(html) {
   const codepoints = new Set([...html].map((char) => char.codePointAt(0)))
   const faces = []
 
-  // The kept set shrinks as well as grows when the page's text changes.
   await rm(fontsOut, { recursive: true, force: true })
 
   for (const { theme, slug } of indexFonts) {
@@ -213,7 +217,7 @@ async function copyFonts(html) {
     await mkdir(path.join(fontsOut, slug), { recursive: true })
 
     for (const [rule] of css.matchAll(/@font-face\{[^}]*\}/g)) {
-      if (!wanted(rule, codepoints)) continue
+      if (!covers(rule, codepoints)) continue
 
       const chunk = /url\("\.\/([^"]+)"\)/.exec(rule)
       if (!chunk) throw new Error(`${slug}: a face names no chunk`)
@@ -222,7 +226,7 @@ async function copyFonts(html) {
       faces.push(rule.replace('./', `./${slug}/`))
     }
 
-    // The OFL binds redistribution, so each family's licence travels with it.
+    // The OFL requires the licence to ship with the font.
     const family = slug.replace(/-\d+$/, '')
     for (const file of await readdir(fontsDir)) {
       if (file.startsWith(family) && file.endsWith('.txt')) {
@@ -255,8 +259,7 @@ for (const name of names) {
 
   if (!indexOnly) {
     console.log(`${name}: building`)
-    // Pages has no SPA fallback, so reloading on /t/<name>/5 would otherwise
-    // ask the server for a path that is not there.
+    // Pages has no SPA fallback, so reloading on /t/<name>/5 would 404.
     slidev(deck, [
       'build',
       'slides.md',
@@ -286,8 +289,6 @@ for (const name of names) {
   decks.push(deck)
 }
 
-// The page is a list of themes but the build is keyed on decks. Two decks on
-// one theme would list it twice, with one description and two ticks.
 const byTheme = new Map()
 for (const deck of decks) {
   const seen = byTheme.get(deck.theme)
@@ -304,8 +305,7 @@ for (const theme of await readdir(path.join(root, 'themes'), { withFileTypes: tr
 const repo = flag('repo', 'https://github.com/yuto0226/slidev-tmpl')
 const html = page(decks, { base, origin, repo, fonts: indexFonts })
 
-// Which chunks the page needs is read off its rendered text, so the page is
-// rendered before the fonts are copied.
+// The fonts to copy are read off the rendered page, so it is rendered first.
 await copyFonts(html)
 
 await writeFile(path.join(outDir, 'index.html'), html, 'utf8')
