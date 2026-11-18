@@ -1,5 +1,5 @@
 <template>
-  <div class="slidev-layout tmpl-page content">
+  <div class="slidev-layout tmpl-page default">
     <div class="tmpl-body">
       <slot />
     </div>

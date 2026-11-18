@@ -38,7 +38,7 @@ li {
 </style>
 
 ---
-layout: content
+layout: default
 ---
 
 # 標題
@@ -51,7 +51,7 @@ layout: content
   - Sub item
 
 ---
-layout: content
+layout: default
 ---
 
 # 標題
@@ -74,7 +74,7 @@ layout: section
 哈哈想不到吧
 
 ---
-layout: content
+layout: default
 ---
 
 # Code Section
@@ -94,7 +94,7 @@ bool writeFile(…) {
 ```
 
 ---
-layout: content
+layout: default
 ---
 
 # Debug
@@ -134,7 +134,7 @@ layout: two-cols
 />
 
 ---
-layout: content
+layout: default
 ---
 
 # 記憶體 Memory
