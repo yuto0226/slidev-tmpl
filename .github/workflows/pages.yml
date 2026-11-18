@@ -43,7 +43,7 @@ jobs:
             .cache/fonts
             themes/*/styles/fonts
             themes/*/styles/fonts.css
-          key: fonts-${{ hashFiles('themes/*/fonts.toml', 'scripts/fetch-fonts.mjs') }}
+          key: fonts-${{ hashFiles('themes/*/fonts.toml', 'scripts/fonts.mjs') }}
 
       - if: steps.fonts.outputs.cache-hit != 'true'
         run: pnpm fonts
