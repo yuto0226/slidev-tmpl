@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { hex } from '../composables/hex'
+import { hex } from '../lib/hex'
 
 const props = defineProps({
   // The lowest address the frame covers, which is the bottom of the drawing.
