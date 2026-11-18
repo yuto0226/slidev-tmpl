@@ -5,14 +5,14 @@
 <style>
 .page-number {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  right: var(--tmpl-cell);
+  bottom: var(--tmpl-cell);
   width: var(--tmpl-cell);
   height: var(--tmpl-cell);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--tmpl-page-size);
-  color: var(--tmpl-page);
+  font-size: var(--tmpl-caption-size);
+  color: #cdd6f4 /* text */;
 }
 </style>
