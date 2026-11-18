@@ -17,7 +17,8 @@
     "fonts": "node scripts/fonts.mjs",
     "fonts:check": "node scripts/fonts.mjs --check",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "fit": "node scripts/fit.mjs"
   },
   "devDependencies": {
     "@slidev/parser": "^53.1.0",
