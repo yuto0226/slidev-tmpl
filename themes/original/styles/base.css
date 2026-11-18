@@ -1,14 +1,11 @@
-/* An unregistered custom property reads back as the text that was written, so
-   a calc() reaches script as a string. Declaring the type makes the computed
-   value a length everywhere, script included. */
+/* Registered so getComputedStyle returns px; slide-top.vue reads it as a number. */
 @property --tmpl-margin {
   syntax: '<length>';
   inherits: true;
   initial-value: 0px;
 }
 
-/* html:root rather than :root, because Slidev defines the same names on
-   :root and its stylesheet loads after this one. */
+/* Outweighs Slidev's :root, which loads later. */
 html:root {
   --tmpl-bg: #1e1e2e;
   --tmpl-fg: #ffffff;
@@ -16,44 +13,44 @@ html:root {
   --tmpl-accent: #89b3fa;
   --tmpl-mark: #cba6f7;
   --tmpl-prompt: #e64553;
-  --tmpl-page: #cdd6f4;
+  --tmpl-danger: #f38ba8;
+  --tmpl-success: #a6e3a1;
+  --tmpl-warning: #f9e2af;
   --tmpl-highlight: #2f2f48;
-  /* Opaque, so two edges that meet do not read as one darker line. */
+  /* Opaque, so meeting edges do not double up. */
   --tmpl-rule: #5c6074;
   --tmpl-rule-dim: #353748;
   --tmpl-rule-width: 2px;
-  --tmpl-gutter: 18px;
+  --tmpl-code-gutter: 18px;
 
   --tmpl-canvas-width: 960px;
   --tmpl-canvas-height: 540px;
 
-  /* A cell is one line of body text, 24px at a line height of 1.25, so a box
-     placed in whole cells lands on the same lines as the text in it. */
-  --tmpl-cell: 30px;
+  /* Largest square that tiles 960x540: 48 across, 27 down. */
+  --tmpl-cell: 20px;
   --tmpl-half: calc(var(--tmpl-cell) / 2);
-  --tmpl-margin: calc(2 * var(--tmpl-cell));
+  --tmpl-margin: calc(3 * var(--tmpl-cell));
   --tmpl-content-width: calc(var(--tmpl-canvas-width) - 2 * var(--tmpl-margin));
 
-  /* A cover and a section place the block three cells down because a block on
-     the geometric centre reads as sitting low. */
-  --tmpl-title-top: calc(3 * var(--tmpl-cell));
-  --tmpl-title-height: calc(6 * var(--tmpl-cell));
+  --tmpl-title-top: calc(4 * var(--tmpl-cell));
+  --tmpl-title-height: calc(9 * var(--tmpl-cell));
   --tmpl-text-top: calc(var(--tmpl-title-top) + var(--tmpl-title-height));
-  --tmpl-text-height: calc(4 * var(--tmpl-cell));
+  --tmpl-text-height: calc(6 * var(--tmpl-cell));
 
-  /* Every size is a multiple of 12, so a line at 1.25 is a multiple of the
-     half cell. The grid aligns line boxes and not baselines, because CSS
-     splits the leading above and below the glyphs and a baseline sits a little
-     inside its cell. */
-  --tmpl-line: 1.25;
-  --tmpl-display-size: 60px;
-  --tmpl-title-size: 48px;
-  --tmpl-subtitle-size: 36px;
-  --tmpl-body-size: 24px;
-  --tmpl-page-size: 12px;
+  --tmpl-heading-line: 1.25;
+  /* CJK glyphs fill the em box, so emphasis dots and the wavy underline go in the extra leading. */
+  --tmpl-body-line: 1.5;
+  --tmpl-display-size: 3rem;
+  --tmpl-title-size: 2.25rem;
+  --tmpl-subtitle-size: 1.5rem;
+  --tmpl-body-size: 1.25rem;
+  --tmpl-aside-size: 1rem;
+  --tmpl-note-size: 0.875rem;
+  --tmpl-caption-size: 0.75rem;
 
-  --tmpl-para-gap: var(--tmpl-half);
+  --tmpl-flow-gap: var(--tmpl-half);
   --tmpl-indent: var(--tmpl-cell);
+  --tmpl-quarter: calc(var(--tmpl-half) / 2);
 
   --slidev-theme-primary: var(--tmpl-accent);
   --slidev-code-background: transparent;
@@ -61,26 +58,66 @@ html:root {
   --slidev-code-padding: 0;
   --slidev-code-margin: 0;
   --slidev-code-radius: 0;
-  --slidev-code-font-size: 14px;
-  --slidev-code-line-height: 1.5;
+  --slidev-code-font-size: var(--tmpl-note-size);
+  --slidev-code-line-height: 1.25;
 }
 
 .slidev-layout {
   position: relative;
-  /* A box placed by its top margin would otherwise push the whole slide
-     down with it. */
+  /* Contains the body's top margin, which would push the slide down. */
   display: flow-root;
   height: 100%;
   padding: 0;
   background: var(--tmpl-bg);
   color: var(--tmpl-fg);
   font-size: var(--tmpl-body-size);
-  line-height: var(--tmpl-line);
+  line-height: var(--tmpl-body-line);
   font-weight: 500;
 }
 
-.slidev-layout h1,
-.slidev-layout h2,
-.slidev-layout h3 {
+/* UnoCSS icon classes set no display, so a span collapses. */
+[class^='i-'],
+[class*=' i-'] {
+  display: inline-block;
+  vertical-align: -0.125em;
+}
+
+.slidev-layout :where(h1, h2, h3) {
+  margin: 0;
   font-weight: 700;
+  line-height: var(--tmpl-heading-line);
+}
+
+/* Slidev draws a border under a link. */
+.slidev-layout a {
+  border-bottom: 0;
+  text-decoration: underline dashed;
+  text-decoration-color: var(--tmpl-accent);
+  text-decoration-thickness: 0.09375rem;
+  text-underline-offset: 0.15em;
+  background-image: linear-gradient(var(--tmpl-highlight), var(--tmpl-highlight));
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 0 100%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-size 250ms ease-out;
+}
+
+/* Outweighs Slidev's hover rule, which recolours the text. */
+html .slidev-layout a:hover {
+  color: inherit;
+  background-size: 100% 100%;
+}
+
+.slidev-layout :where(h1) {
+  font-size: var(--tmpl-title-size);
+}
+
+.slidev-layout :where(h2) {
+  font-size: var(--tmpl-subtitle-size);
+}
+
+.slidev-layout :where(h3) {
+  font-size: var(--tmpl-body-size);
 }

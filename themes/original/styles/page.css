@@ -1,14 +1,19 @@
+.tmpl-page {
+  --tmpl-body-x: var(--tmpl-margin);
+  --tmpl-body-width: var(--tmpl-content-width);
+}
+
 .tmpl-page h1 {
   position: absolute;
-  left: var(--tmpl-margin);
+  left: var(--tmpl-body-x);
   top: var(--tmpl-margin);
-  width: var(--tmpl-content-width);
-  height: calc(2 * var(--tmpl-cell));
+  width: var(--tmpl-body-width);
+  height: calc(3 * var(--tmpl-cell));
   margin: 0;
   display: flex;
   align-items: center;
   font-size: var(--tmpl-title-size);
-  line-height: var(--tmpl-line);
+  line-height: var(--tmpl-heading-line);
 }
 
 .tmpl-page h1::before {
@@ -16,20 +21,16 @@
   color: var(--tmpl-prompt);
 }
 
-/* The body box holds the title's heading, so it is placed by margins, because
-   an offset would make it the heading's containing block and carry the heading
-   along. */
+/* An offset would make this the containing block of the absolute h1. */
 .tmpl-body {
-  margin: calc(5 * var(--tmpl-cell)) 0 0 var(--tmpl-margin);
-  width: var(--tmpl-content-width);
-  height: calc(11 * var(--tmpl-cell));
+  margin: calc(7 * var(--tmpl-cell)) 0 0 var(--tmpl-body-x, var(--tmpl-margin));
+  width: var(--tmpl-body-width, var(--tmpl-content-width));
+  height: calc(17 * var(--tmpl-cell));
   display: flex;
   flex-direction: column;
-  gap: var(--tmpl-para-gap);
+  gap: var(--tmpl-flow-gap);
 }
 
-/* Anchored to its bottom edge, so the title grows upward and the gap to the
-   text below holds however many lines it takes. */
 .tmpl-display,
 .section h1 {
   position: absolute;
@@ -41,34 +42,141 @@
   justify-content: flex-end;
   font-size: var(--tmpl-display-size);
   font-weight: 700;
-  line-height: var(--tmpl-line);
+  line-height: var(--tmpl-heading-line);
 }
 
-/* The CSS reset drops list markers, and revert brings the browser's own back. */
-.tmpl-body :where(ul, ol) {
+:is(.tmpl-body, .tmpl-area) :where(ul, ol) {
+  display: grid;
+  gap: var(--tmpl-flow-gap);
   margin: 0;
   padding-left: var(--tmpl-indent);
   list-style: revert;
 }
 
-/* An ordered list keeps the disc marker and prints its number in ::before,
-   because a number as the marker would be wider than the indent and overrun
-   the box. */
-.tmpl-body ol {
+/* A counter used as the marker would be wider than the indent. */
+:is(.tmpl-body, .tmpl-area) ol {
   list-style-type: disc;
 }
 
-.tmpl-body ol > li::before {
+:is(.tmpl-body, .tmpl-area) ol > li::before {
   content: counter(list-item, decimal-leading-zero) ' ';
   color: var(--tmpl-mark);
 }
 
-.tmpl-body :where(ul, ol) {
-  display: grid;
-  gap: var(--tmpl-para-gap);
+:is(.tmpl-body, .tmpl-area) :where(ul, ol) :where(ul, ol) {
+  gap: calc(var(--tmpl-flow-gap) / 2);
+  margin-top: calc(var(--tmpl-flow-gap) / 2);
 }
 
-.tmpl-body :where(ul, ol) :where(ul, ol) {
-  gap: calc(var(--tmpl-para-gap) / 2);
-  margin-top: calc(var(--tmpl-para-gap) / 2);
+.tmpl-area {
+  position: absolute;
+  inset: var(--tmpl-margin);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tmpl-flow-gap);
+}
+
+.tmpl-middle {
+  justify-content: center;
+}
+
+.tmpl-image-pane {
+  position: absolute;
+  top: 0;
+  width: calc(18 * var(--tmpl-cell));
+  height: var(--tmpl-canvas-height);
+}
+
+.tmpl-credit {
+  position: absolute;
+  left: var(--tmpl-half);
+  bottom: var(--tmpl-half);
+  color: rgb(255 255 255 / 70%);
+  font-size: var(--tmpl-caption-size);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 70%);
+}
+
+.image .tmpl-credit {
+  left: var(--tmpl-margin);
+  bottom: var(--tmpl-margin);
+}
+
+.image-left {
+  --tmpl-body-x: calc(20 * var(--tmpl-cell));
+  --tmpl-body-width: calc(25 * var(--tmpl-cell));
+}
+
+.image-left .tmpl-image-pane {
+  left: 0;
+}
+
+.image-right {
+  --tmpl-body-width: calc(25 * var(--tmpl-cell));
+}
+
+.image-right .tmpl-image-pane {
+  right: 0;
+}
+
+/* A grid body has no place for a stray child. */
+.tmpl-body:not(.tmpl-cols, .tmpl-rows):has(> .footnotes) {
+  height: calc(19 * var(--tmpl-cell));
+}
+
+.tmpl-body:not(.tmpl-cols, .tmpl-rows) > .footnotes {
+  position: static;
+  width: auto;
+  margin-top: auto;
+  padding-top: var(--tmpl-half);
+}
+
+/* One cell of gutter leaves 41 of 42 cells, so an even split is a half cell. */
+.tmpl-cols {
+  display: grid;
+  grid-template-columns: var(--tmpl-cols-left, calc(20.5 * var(--tmpl-cell))) minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  column-gap: var(--tmpl-cell);
+  /* Cancels the flex gap from .tmpl-body. */
+  row-gap: 0;
+}
+
+.tmpl-rows {
+  display: grid;
+  grid-template-rows: auto var(--tmpl-rows-top, calc(8 * var(--tmpl-cell))) 1fr;
+  row-gap: 0;
+}
+
+:is(.tmpl-cols, .tmpl-rows) > * {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tmpl-flow-gap);
+  min-height: 0;
+}
+
+.tmpl-cols-span {
+  grid-column: 1 / 3;
+}
+
+/* The h1 is positioned, so a title-only band has no height and row-gap would apply either way. */
+:is(.tmpl-cols-span, .tmpl-rows-span):has(> :not(h1)) {
+  margin-bottom: var(--tmpl-cell);
+}
+
+.tmpl-cols-left {
+  grid-column: 1;
+}
+
+.tmpl-cols-right {
+  grid-column: 2;
+}
+
+.tmpl-rows-bottom {
+  margin-top: var(--tmpl-cell);
+}
+
+.tmpl-cols-bottom {
+  grid-column: 1 / 3;
+  margin-top: var(--tmpl-cell);
+  justify-content: flex-end;
+  color: var(--tmpl-muted);
 }
