@@ -1,5 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { useCodeBand } from './composables/codeBand'
+import { useFootnoteHighlight } from './composables/footnoteHighlight'
 import { guideLevel } from './composables/guides'
 
 const authoring = import.meta.env.DEV
@@ -7,6 +9,9 @@ const authoring = import.meta.env.DEV
 const root = ref(null)
 const cols = ref([])
 const rows = ref([])
+
+useCodeBand(root)
+useFootnoteHighlight(root)
 
 /* The overlay is laid out in slide units and shown scaled, so the ratio of the
    bounding width to offsetWidth converts a measurement back to slide units. */
@@ -52,8 +57,8 @@ watch(guideLevel, () => requestAnimationFrame(measure))
 <template>
   <!-- Slidev renders this layer inside every slide, so a line drawn at 30px
        lands on the cell the layout was placed in. -->
-  <div v-if="authoring" ref="root" class="tmpl-guides">
-    <template v-if="guideLevel">
+  <div ref="root" class="tmpl-guides">
+    <template v-if="authoring && guideLevel">
       <div v-if="guideLevel === 2" class="tmpl-guides-grid tmpl-guides-halves" />
       <div class="tmpl-guides-grid tmpl-guides-cells" />
       <div

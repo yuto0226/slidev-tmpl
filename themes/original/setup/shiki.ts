@@ -6,6 +6,6 @@ export default defineShikiSetup(() => ({
     dark: 'catppuccin-mocha',
     light: 'catppuccin-latte',
   },
-  // A line ending in `// [!code bp]` is one a debugger was told to stop at.
+  // `// [!code bp]` at the end of a line marks a breakpoint.
   transformers: [transformerNotationMap({ classMap: { bp: 'code-breakpoint' } })],
 }))

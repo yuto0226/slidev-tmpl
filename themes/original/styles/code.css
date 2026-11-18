@@ -1,57 +1,56 @@
 .slidev-code {
-  --tmpl-breakpoint-row: rgb(255 80 80 / 40%);
-  --tmpl-breakpoint-dot: #c00000;
   --tmpl-code-fade: 0.35;
   --tmpl-code-band: var(--tmpl-highlight);
+  --tmpl-breakpoint-row: rgb(255 80 80 / 40%);
+  --tmpl-breakpoint-dot: #c00000;
 }
 
-/* The CSS reset claims every code element. Slidev answers it on the fenced
-   block's pre, but the code element Shiki nests inside matches the reset
-   again, and inline code is never answered. */
+/* Slidev resets only the fenced block's pre. */
 .slidev-code code,
 .slidev-layout :not(pre) > code {
   font-family: var(--slidev-code-font-family);
 }
 
-/* CJK has no italic, so a comment set in italic is sheared rather than drawn,
-   and comments are where Chinese most often appears in code. */
 .slidev-code,
 .slidev-code * {
   font-style: normal;
   font-synthesis: none;
 }
 
-/* A line is an inline span, so its background would stop at the last glyph. A
-   grid makes each line a full-width row and drops the newlines between lines. */
+/* A line is an inline span, so its background would stop at the last glyph. */
 .slidev-code code {
   display: grid;
 }
 
-/* An empty grid row has no height, so a blank line needs content to keep its
-   row. */
 .slidev-code .line:empty::after {
   content: ' ';
 }
 
-/* The band appears only once some line has been dimmed, because the first step
-   of a walk marks every line and would otherwise tint the whole block. */
-.slidev-code:has(.slidev-code-dishonored) .slidev-code-highlighted {
-  background: var(--tmpl-code-band);
+/* Placed by useCodeBand. */
+.slidev-code code {
+  background-image: linear-gradient(var(--tmpl-code-band), var(--tmpl-code-band));
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  background-position: 0 var(--tmpl-code-band-top, 0);
+  background-size: 100% var(--tmpl-code-band-height, 0);
+  transition:
+    background-position 250ms ease-out,
+    background-size 250ms ease-out;
 }
 
 .slidev-code .slidev-code-dishonored {
   opacity: var(--tmpl-code-fade);
 }
 
-/* A step in a debugger view marks where execution stopped and not what the
-   talk is about, so nothing is dimmed. */
 .code-debug .slidev-code {
   --tmpl-code-fade: 1;
   --tmpl-code-band: var(--tmpl-breakpoint-row);
 }
 
+/* Keeps code from shifting sideways when it morphs into the debug block. */
+.code-gutter .slidev-code code,
 .code-debug .slidev-code code {
-  padding-left: var(--tmpl-gutter);
+  padding-left: var(--tmpl-code-gutter);
 }
 
 .code-debug .code-breakpoint {
@@ -61,11 +60,16 @@
 .code-debug .code-breakpoint::after {
   content: '';
   position: absolute;
-  left: calc(-1 * var(--tmpl-gutter));
+  left: calc(-1 * var(--tmpl-code-gutter));
   top: 50%;
   translate: 0 -50%;
-  width: 11px;
-  height: 11px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--tmpl-breakpoint-dot);
+}
+
+/* View-transition names must be unique in the document. */
+.code-morph {
+  view-transition-name: code;
 }
