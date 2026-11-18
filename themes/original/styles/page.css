@@ -33,7 +33,7 @@
 .tmpl-display,
 .section h1 {
   position: absolute;
-  top: var(--tmpl-block-top);
+  top: var(--tmpl-title-top);
   height: var(--tmpl-title-height);
   margin: 0;
   display: flex;

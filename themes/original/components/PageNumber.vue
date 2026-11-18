@@ -1,9 +1,9 @@
 <template>
-  <div class="tmpl-page-number">{{ $slidev.nav.currentPage }}</div>
+  <div class="page-number">{{ $slidev.nav.currentPage }}</div>
 </template>
 
 <style>
-.tmpl-page-number {
+.page-number {
   position: absolute;
   right: 0;
   bottom: 0;

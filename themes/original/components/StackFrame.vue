@@ -7,7 +7,7 @@ const props = defineProps({
   base: { type: String, required: true },
   // Regions in memory order, lowest address first.
   regions: { type: Array, required: true },
-  word: { type: Number, default: 4 },
+  wordSize: { type: Number, default: 4 },
   // A region taller than this is drawn broken rather than to scale.
   maxWords: { type: Number, default: 4 },
   steps: { type: Boolean, default: false },
@@ -25,7 +25,7 @@ function address(offset) {
 const rows = computed(() => {
   let offset = 0
   const out = props.regions.map((region) => {
-    const words = Math.max(1, Math.round(region.size / props.word))
+    const words = Math.max(1, Math.round(region.size / props.wordSize))
     const row = {
       ...region,
       addr: address(offset),

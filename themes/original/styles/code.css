@@ -1,5 +1,7 @@
 .slidev-code {
-  --tmpl-code-dim: 0.35;
+  --tmpl-breakpoint-row: rgb(255 80 80 / 40%);
+  --tmpl-breakpoint-dot: #c00000;
+  --tmpl-code-fade: 0.35;
   --tmpl-code-band: var(--tmpl-highlight);
 }
 
@@ -38,13 +40,13 @@
 }
 
 .slidev-code .slidev-code-dishonored {
-  opacity: var(--tmpl-code-dim);
+  opacity: var(--tmpl-code-fade);
 }
 
 /* A step in a debugger view marks where execution stopped and not what the
    talk is about, so nothing is dimmed. */
 .code-debug .slidev-code {
-  --tmpl-code-dim: 1;
+  --tmpl-code-fade: 1;
   --tmpl-code-band: var(--tmpl-breakpoint-row);
 }
 

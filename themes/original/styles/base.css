@@ -22,8 +22,6 @@ html:root {
   --tmpl-rule: #5c6074;
   --tmpl-rule-dim: #353748;
   --tmpl-rule-width: 2px;
-  --tmpl-breakpoint-row: rgb(255 80 80 / 40%);
-  --tmpl-breakpoint-dot: #c00000;
   --tmpl-gutter: 18px;
 
   --tmpl-canvas-width: 960px;
@@ -38,9 +36,9 @@ html:root {
 
   /* A cover and a section place the block three cells down because a block on
      the geometric centre reads as sitting low. */
-  --tmpl-block-top: calc(3 * var(--tmpl-cell));
+  --tmpl-title-top: calc(3 * var(--tmpl-cell));
   --tmpl-title-height: calc(6 * var(--tmpl-cell));
-  --tmpl-text-top: calc(var(--tmpl-block-top) + var(--tmpl-title-height));
+  --tmpl-text-top: calc(var(--tmpl-title-top) + var(--tmpl-title-height));
   --tmpl-text-height: calc(4 * var(--tmpl-cell));
 
   /* Every size is a multiple of 12, so a line at 1.25 is a multiple of the
