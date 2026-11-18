@@ -1,0 +1,367 @@
+.markdown-alert {
+  --tmpl-callout: var(--tmpl-accent);
+}
+
+.markdown-alert-todo,
+.markdown-alert-info {
+  --tmpl-callout: var(--tmpl-accent);
+}
+
+.markdown-alert-abstract,
+.markdown-alert-summary,
+.markdown-alert-tldr,
+.markdown-alert-tip,
+.markdown-alert-hint,
+.markdown-alert-important {
+  --tmpl-callout: #89dceb /* sky */;
+}
+
+.markdown-alert-success,
+.markdown-alert-check,
+.markdown-alert-done {
+  --tmpl-callout: var(--tmpl-success);
+}
+
+.markdown-alert-question,
+.markdown-alert-help,
+.markdown-alert-faq,
+.markdown-alert-warning,
+.markdown-alert-caution,
+.markdown-alert-attention {
+  --tmpl-callout: var(--tmpl-warning);
+}
+
+.markdown-alert-failure,
+.markdown-alert-fail,
+.markdown-alert-missing,
+.markdown-alert-danger,
+.markdown-alert-error,
+.markdown-alert-bug {
+  --tmpl-callout: var(--tmpl-danger);
+}
+
+.markdown-alert-example {
+  --tmpl-callout: var(--tmpl-mark);
+}
+
+.markdown-alert-quote,
+.markdown-alert-cite,
+.markdown-alert-remark {
+  --tmpl-callout: var(--tmpl-muted);
+}
+
+.markdown-alert-definition,
+.markdown-alert-recall {
+  --tmpl-callout: #b4befe; /* lavender */
+}
+
+.markdown-alert-theorem,
+.markdown-alert-corollary,
+.markdown-alert-answer,
+.markdown-alert-solution {
+  --tmpl-callout: #94e2d5; /* teal */
+}
+
+.markdown-alert-lemma,
+.markdown-alert-proposition {
+  --tmpl-callout: #74c7ec; /* sapphire */
+}
+
+.markdown-alert-proof,
+.markdown-alert-notation {
+  --tmpl-callout: #9399b2; /* overlay2 */
+}
+
+.markdown-alert-axiom {
+  --tmpl-callout: #eba0ac; /* maroon */
+}
+
+.markdown-alert-conjecture {
+  --tmpl-callout: #f5c2e7; /* pink */
+}
+
+.markdown-alert-intuition,
+.markdown-alert-explanation {
+  --tmpl-callout: #fab387; /* peach */
+}
+
+.markdown-alert-exercise,
+.markdown-alert-problem {
+  --tmpl-callout: #f2cdcd; /* flamingo */
+}
+
+/* 0.25em in Primer and Tailwind Typography, which is 4px here. */
+:is(.tmpl-body, .tmpl-area) :where(blockquote),
+.slidev-layout .markdown-alert {
+  margin: 0;
+  border-left: calc(2 * var(--tmpl-rule-width)) solid var(--tmpl-rule);
+}
+
+:is(.tmpl-body, .tmpl-area) :where(blockquote) {
+  padding-left: var(--tmpl-half);
+  color: var(--tmpl-muted);
+}
+
+.slidev-layout .markdown-alert {
+  /* The base sheet colours each type by name. */
+  --color-note: var(--tmpl-callout);
+  --color-tip: var(--tmpl-callout);
+  --color-important: var(--tmpl-callout);
+  --color-warning: var(--tmpl-callout);
+  --color-caution: var(--tmpl-callout);
+  --color-severe: var(--tmpl-callout);
+
+  padding: var(--tmpl-half);
+  border-left-color: var(--tmpl-callout);
+  background: color-mix(in srgb, var(--tmpl-callout) 6%, transparent);
+  font-size: var(--tmpl-aside-size);
+}
+
+/* Overrides the base sheet's line-height of 1 on the label. */
+.slidev-layout .markdown-alert-title {
+  margin-bottom: calc(var(--tmpl-flow-gap) / 2);
+  color: var(--tmpl-callout);
+  font-weight: 700;
+  line-height: var(--tmpl-heading-line);
+}
+
+.slidev-layout .markdown-alert .markdown-alert-icon,
+.slidev-layout .markdown-alert .octicon {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+}
+
+/* The faces have no italic, and text-emphasis dots are too small, so the dots are a background tile. */
+.slidev-layout :where(em, i) {
+  font-style: normal;
+  padding-bottom: 0.2em;
+  background-image: radial-gradient(circle, var(--tmpl-pen) 0.075em, transparent 0.075em);
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  background-size: 1em 0.2em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Pen names are the six Shoka uses. */
+.slidev-layout :is(mark, ins) {
+  --tmpl-pen: var(--tmpl-mark);
+}
+
+.slidev-layout :is(em, i, s, del, span) {
+  --tmpl-pen: currentColor;
+}
+
+.slidev-layout .primary {
+  --tmpl-pen: var(--tmpl-mark);
+}
+
+.slidev-layout .info {
+  --tmpl-pen: var(--tmpl-accent);
+}
+
+.slidev-layout .success {
+  --tmpl-pen: var(--tmpl-success);
+}
+
+.slidev-layout .warning {
+  --tmpl-pen: var(--tmpl-warning);
+}
+
+.slidev-layout .danger {
+  --tmpl-pen: var(--tmpl-danger);
+}
+
+.slidev-layout .muted {
+  --tmpl-pen: var(--tmpl-muted);
+}
+
+.slidev-layout span:is(.primary, .info, .success, .warning, .danger, .muted) {
+  color: var(--tmpl-pen);
+}
+
+/* markdown-it renders ~~text~~ as <s>; <del> comes from hand-written HTML. */
+.slidev-layout :is(s, del) {
+  text-decoration-color: var(--tmpl-pen);
+  text-decoration-thickness: var(--tmpl-rule-width);
+}
+
+.slidev-layout .font-display {
+  font-size: var(--tmpl-display-size);
+}
+
+.slidev-layout .font-title {
+  font-size: var(--tmpl-title-size);
+}
+
+.slidev-layout .font-subtitle {
+  font-size: var(--tmpl-subtitle-size);
+}
+
+.slidev-layout .font-body {
+  font-size: var(--tmpl-body-size);
+}
+
+.slidev-layout .font-aside {
+  font-size: var(--tmpl-aside-size);
+}
+
+.slidev-layout .font-note {
+  font-size: var(--tmpl-note-size);
+}
+
+.slidev-layout .font-caption {
+  font-size: var(--tmpl-caption-size);
+}
+
+.slidev-layout mark {
+  padding: 0;
+  background: linear-gradient(
+    transparent calc(100% - 0.45em),
+    color-mix(in srgb, var(--tmpl-pen) 55%, transparent) 0
+  );
+  color: inherit;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* waves.ts writes --tmpl-wave from these pens and base.css's palette. */
+.slidev-layout ins {
+  text-decoration: none;
+  /* A CJK em box runs about 1.14em, leaving 0.36em of a 1.5 line for the wave. */
+  padding-bottom: 0.24em;
+  background-image: var(--tmpl-wave);
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  background-size: 0.5em 0.24em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.slidev-layout :is(ins.solid, ins.dotted) {
+  background-image: none;
+  text-decoration: underline var(--tmpl-pen);
+  text-decoration-thickness: var(--tmpl-rule-width);
+  text-underline-offset: 0.25em;
+}
+
+.slidev-layout ins.dotted {
+  text-decoration-style: dotted;
+}
+
+:is(.tmpl-body, .tmpl-area) :where(hr) {
+  margin: 0;
+  border: 0;
+  border-top: var(--tmpl-rule-width) solid var(--tmpl-rule);
+}
+
+:is(.tmpl-body, .tmpl-area) :where(img) {
+  max-width: 100%;
+}
+
+:is(.tmpl-body, .tmpl-area) :where(table) {
+  border-collapse: collapse;
+  text-align: left;
+}
+
+:is(.tmpl-body, .tmpl-area) :where(th, td) {
+  padding: var(--tmpl-quarter) var(--tmpl-cell) var(--tmpl-quarter) 0;
+  vertical-align: top;
+}
+
+:is(.tmpl-body, .tmpl-area) :where(thead th) {
+  border-bottom: var(--tmpl-rule-width) solid var(--tmpl-rule);
+  color: var(--tmpl-muted);
+  font-weight: 500;
+}
+
+.slidev-layout :not(pre) > code {
+  padding: 0 0.25ch;
+  background: var(--tmpl-highlight);
+  /* Ligatures would redraw == and ->. */
+  font-variant-ligatures: none;
+}
+
+/* KaTeX's 1.21 ratio is tuned for Latin and reads oversized beside CJK. */
+.slidev-layout .katex {
+  font-size: 1.05em;
+}
+
+.slidev-layout .footnotes {
+  position: absolute;
+  left: var(--tmpl-body-x, var(--tmpl-margin));
+  width: calc(var(--tmpl-body-width, var(--tmpl-content-width)) - 2 * var(--tmpl-cell));
+  bottom: var(--tmpl-cell);
+  margin: 0;
+  font-size: var(--tmpl-caption-size);
+  line-height: 1.3;
+  color: var(--tmpl-muted);
+}
+
+.slidev-layout .footnotes-sep {
+  display: none;
+}
+
+:is(.references .tmpl-body > ol, .slidev-layout .footnotes-list) {
+  display: block;
+  padding-left: 0;
+  list-style: none;
+  color: var(--tmpl-muted);
+}
+
+:is(.references .tmpl-body > ol, .slidev-layout .footnotes-list) > li {
+  padding-left: 3.5ch;
+  text-indent: -3.5ch;
+}
+
+:is(.references .tmpl-body > ol, .slidev-layout .footnotes-list) > li::before {
+  content: '[' counter(list-item) '] ';
+  color: var(--tmpl-fg);
+}
+
+:is(.references .tmpl-body, .slidev-layout .footnotes) :where(em, i) {
+  background-image: none;
+  color: var(--tmpl-mark);
+}
+
+/* The base sheet colours a link on hover. */
+html :is(.references .tmpl-body, .slidev-layout .footnotes) :is(a, a:hover) {
+  color: var(--tmpl-fg);
+}
+
+.slidev-layout .footnotes-list > li + li {
+  margin-top: var(--tmpl-quarter);
+}
+
+.slidev-layout .footnotes-list > li > p {
+  background-image: linear-gradient(
+    transparent calc(100% - 0.45em),
+    color-mix(in srgb, var(--tmpl-mark) 55%, transparent) 0
+  );
+  background-repeat: no-repeat;
+  background-position: right;
+  background-size: 0 100%;
+  transition: background-size 0.25s ease-out;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.slidev-layout .footnotes-list > li.tmpl-footnote-active > p {
+  background-position: left;
+  background-size: 100% 100%;
+}
+
+.slidev-layout .footnotes-list p {
+  display: inline;
+  margin: 0;
+}
+
+.slidev-layout .footnote-backref {
+  display: none;
+}
+
+.footnote-ref a {
+  text-decoration: none;
+  color: var(--tmpl-mark);
+}

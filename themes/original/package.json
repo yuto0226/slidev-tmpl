@@ -29,6 +29,16 @@
     }
   },
   "devDependencies": {
-    "@shikijs/transformers": "^4.6.0"
+    "@iconify-json/carbon": "^1.2.30",
+    "@iconify-json/fa6-brands": "^1.2.6",
+    "@iconify-json/ph": "^1.2.2",
+    "@shikijs/transformers": "^4.6.0",
+    "markdown-it-attrs": "^4.3.1",
+    "markdown-it-bracketed-spans": "^1.0.3",
+    "markdown-it-github-alerts": "^1.0.1",
+    "markdown-it-ins": "^4.0.0",
+    "markdown-it-mark": "^4.0.0",
+    "markdown-it-sub": "^2.0.0",
+    "markdown-it-sup": "^2.0.0"
   }
 }
