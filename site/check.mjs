@@ -172,6 +172,8 @@ function deck(name, page) {
     for (const char of body) {
       const code = char.codePointAt(0)
       if (code < 0x2e80) continue
+      // Variation selectors and format characters have no glyph of their own.
+      if (/[\p{Cf}︀-️\u{E0100}-\u{E01EF}]/u.test(char)) continue
       if (!covered.some(([low, high]) => code >= low && code <= high)) uncovered.add(char)
     }
   }
