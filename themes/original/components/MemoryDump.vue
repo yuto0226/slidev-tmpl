@@ -1,16 +1,47 @@
 <script setup>
+import { useSlideContext } from '@slidev/client'
 import { computed } from 'vue'
 import { hex } from '../lib/hex'
 
 const props = defineProps({
-  bytes: { type: String, required: true },
+  bytes: { type: String, default: '' },
+  size: { type: Number, default: 0 },
   base: { type: String, default: '0x0000' },
-  // Offsets from base, start inclusive and end exclusive, like a slice.
-  mark: { type: Array, default: () => [] },
+  // Entries are { at, size } or { at, bytes }, and overflow draws in the alert colour.
+  writes: { type: Array, default: () => [] },
+  fill: { type: String, default: '41' },
+  // Click of the first write. 0 applies all.
+  fromClick: { type: Number, default: 0 },
   ascii: { type: Boolean, default: false },
 })
 
 const WIDTH = 16
+
+const { $clicks } = useSlideContext()
+
+const parse = (text) =>
+  text
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((byte) => Number.parseInt(byte, 16))
+
+const memory = computed(() => {
+  const initial = parse(props.bytes)
+  const values = Array.from({ length: Math.max(props.size, initial.length) }, (_, i) => initial[i])
+  const over = new Set()
+  props.writes.forEach((write, i) => {
+    if (props.fromClick && $clicks.value < props.fromClick + i) return
+    const bytes = write.bytes
+      ? parse(write.bytes)
+      : Array.from({ length: write.size }, () => Number.parseInt(props.fill, 16))
+    bytes.forEach((byte, k) => {
+      values[write.at + k] = byte
+      if (write.overflow) over.add(write.at + k)
+    })
+  })
+  return { values, over }
+})
 
 const edge = (i) => ({
   'memory-first': i === 0,
@@ -20,30 +51,35 @@ const edge = (i) => ({
 
 const columns = Array.from({ length: WIDTH }, (_, i) => hex(i, 2, { fill: ' ' }))
 
+const BLANK = { hex: '  ', glyph: ' ', class: {} }
+const UNKNOWN = { hex: '??', glyph: ' ', class: { 'memory-unknown': true } }
+
 function cell(byte, offset) {
+  if (byte === undefined) return UNKNOWN
   const printable = byte >= 0x20 && byte <= 0x7e
   return {
     hex: hex(byte, 2),
     glyph: printable ? String.fromCharCode(byte) : '.',
     class: {
-      'diagram-mark': offset >= props.mark[0] && offset < props.mark[1],
+      'diagram-overflow': memory.value.over.has(offset),
       'memory-unprintable': !printable,
     },
   }
 }
 
+const digits = computed(() => Math.max(4, props.base.replace(/^0x/i, '').length))
+
 const rows = computed(() => {
-  const values = props.bytes
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((byte) => Number.parseInt(byte, 16))
+  const { values } = memory.value
   const start = Number.parseInt(props.base, 16)
   const out = []
   for (let offset = 0; offset < values.length; offset += WIDTH) {
+    const row = values.slice(offset, offset + WIDTH)
     out.push({
-      addr: hex(start + offset, 4),
-      cells: values.slice(offset, offset + WIDTH).map((byte, i) => cell(byte, offset + i)),
+      addr: hex(start + offset, digits.value),
+      cells: Array.from({ length: WIDTH }, (_, i) =>
+        i < row.length ? cell(row[i], offset + i) : BLANK,
+      ),
     })
   }
   return out
@@ -88,20 +124,23 @@ const rows = computed(() => {
   border-spacing: 0;
 }
 
-/* Gaps are counted in characters, with one between bytes, two at the halfway
-   mark and one on either side of a column rule. */
 .memory-dump th,
 .memory-dump td {
   padding: 0 0.5ch;
   font-weight: 400;
   text-align: center;
+  white-space: pre;
 }
 
-/* A shadow rather than a border, because a cell's bottom border is mitred
-   into its side borders, and the transparent ones that hold the gaps open
-   would notch the rule wherever a gap falls. */
+/* Cell bottoms land on fractional pixels, so per-cell rules misalign. */
+.memory-dump thead {
+  background-image: linear-gradient(var(--tmpl-rule), var(--tmpl-rule));
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 100% var(--tmpl-rule-width);
+}
+
 .memory-dump thead th {
-  box-shadow: 0 var(--tmpl-rule-width) 0 var(--tmpl-rule);
   color: var(--tmpl-muted);
   white-space: pre;
 }
@@ -119,9 +158,6 @@ const rows = computed(() => {
   white-space: pre;
 }
 
-/* A gap held as padding would be painted by a marked byte's band, which would
-   then start early and sit out of line with its column. A transparent border
-   with the background clipped to the padding box keeps the band to the byte. */
 .memory-dump .memory-first,
 .memory-dump .memory-mid,
 .memory-dump .memory-last {
@@ -140,15 +176,17 @@ const rows = computed(() => {
   border-right: 0.5ch solid transparent;
 }
 
-/* A byte with no character is dimmed through its colour and not its opacity,
-   which would fade a mark's band with it. */
+.memory-dump .memory-unknown {
+  color: color-mix(in srgb, var(--tmpl-muted) 50%, var(--tmpl-bg));
+}
+
+/* Dimmed by colour because opacity would also fade a mark's band. */
 .memory-dump .memory-unprintable {
   color: color-mix(in srgb, var(--tmpl-muted) 60%, var(--tmpl-bg));
 }
 
-/* Ties with .memory-unprintable on specificity and comes after it, so a marked
-   unprintable byte keeps the mark's text colour. */
-.memory-dump .diagram-mark {
-  color: var(--tmpl-bg);
+/* Same specificity as .memory-unprintable, so it must stay after it. */
+.memory-dump .diagram-overflow {
+  color: var(--tmpl-danger);
 }
 </style>

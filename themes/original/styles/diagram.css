@@ -1,5 +1,12 @@
+/* A muted container would dim the diagram. */
 .diagram {
   font-family: var(--slidev-code-font-family);
+  color: var(--tmpl-fg);
+}
+
+/* prose.css table rules reach the diagram and land a second rule 2px off. */
+.diagram :is(th, td) {
+  border-bottom: 0;
 }
 
 .diagram-addr {
@@ -9,4 +16,8 @@
 .diagram-mark {
   background-color: var(--tmpl-mark);
   color: var(--tmpl-bg);
+}
+
+.diagram-overflow {
+  color: var(--tmpl-danger);
 }
