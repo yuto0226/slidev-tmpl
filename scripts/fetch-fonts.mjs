@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const cacheDir = path.join(root, '.cache', 'fonts')
 
-const fail = (who, message) => new Error(`${who}: ${message}`)
+const fontError = (who, message) => new Error(`${who}: ${message}`)
 
 const slugify = (text) =>
   text
