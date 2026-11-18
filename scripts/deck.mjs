@@ -1,4 +1,3 @@
-// dev falls back to DEFAULT, so adding a deck cannot change what `pnpm dev` opens.
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync } from 'node:fs'
 import path from 'node:path'

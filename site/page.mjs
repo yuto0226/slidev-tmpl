@@ -10,7 +10,8 @@ const description = 'Yuto 做簡報用的 Slidev 主題都放在這裡，一個�
 const entities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }
 const escapeHtml = (text) => String(text).replace(/[&<>"]/g, (char) => entities[char])
 
-// A placeholder alone on its line takes the line with it when empty. Prettier reformats html`` templates, so the tag is named markup.
+// A placeholder alone on its line takes the line with it when empty.
+// Prettier reformats an html`` template, so the tag is named markup.
 function markup(strings, ...values) {
   let out = strings[0]
   for (let at = 0; at < values.length; at++) {
@@ -104,7 +105,6 @@ const githubMark = `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden=
 export function page(decks, site) {
   const listed = decks.length > 1
 
-  // The faces the build copied, so a family spelled in the stylesheet cannot disagree with them.
   const faces = site.fonts.map(({ role, family }) => `--${role}: '${family}';`)
 
   return markup`<!doctype html>

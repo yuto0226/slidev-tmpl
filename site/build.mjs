@@ -1,5 +1,3 @@
-// Slidev bakes the base path into asset URLs, so --base is passed in.
-
 import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
@@ -34,7 +32,6 @@ function slidev(deck, args) {
   execFileSync(process.execPath, [cli, ...args], { cwd: deck.dir, stdio: 'inherit' })
 }
 
-// Throws so a renamed token cannot put "null" on the page.
 // rem resolves against the 16px root a slide runs on.
 const ROOT_FONT = 16
 
@@ -138,7 +135,6 @@ async function narrowDeckFonts(out, base) {
   const assets = path.join(out, 'assets')
   if (!existsSync(assets)) return
 
-  // Slidev nests some chunks; the font chunks sit at the top.
   const entries = await readdir(assets, { withFileTypes: true, recursive: true })
   const files = entries
     .filter((entry) => entry.isFile())

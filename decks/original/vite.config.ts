@@ -1,5 +1,4 @@
-/* The site builds every deck into dist/t/<name>, which sits outside this deck,
-   and Vite only empties an outDir it is told it may empty. */
+/* The site builds this deck into dist/, outside the deck, and Vite empties an outDir only where it is told it may. */
 export default {
   build: { emptyOutDir: true },
 }

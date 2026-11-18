@@ -13,7 +13,7 @@
 .markdown-alert-tip,
 .markdown-alert-hint,
 .markdown-alert-important {
-  --tmpl-callout: #89dceb /* sky */;
+  --tmpl-callout: #89dceb; /* sky */
 }
 
 .markdown-alert-success,
